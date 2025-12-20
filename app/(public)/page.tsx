@@ -1,0 +1,177 @@
+import Header from "@/components/layout/Header";
+import Navigation from "@/components/layout/Navigation";
+import Footer from "@/components/layout/Footer";
+import HomeContent from "@/components/home/HomeContent";
+import { prisma } from "@/lib/prisma";
+import { Suspense } from "react";
+import type { Metadata } from "next";
+
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const siteSettings = await prisma.siteSettings.findMany({
+      where: {
+        key: {
+          in: ["site_name", "site_description", "contact_email", "contact_phone"],
+        },
+      },
+    });
+
+    const settingsMap = new Map(siteSettings.map((s) => [s.key, s.value]));
+    const siteName = (settingsMap.get("site_name") as string) || "Property Portal";
+    const siteDescription = (settingsMap.get("site_description") as string) || "B2B Real Estate Portal for viewing projects, price trends, and inventory";
+
+    return {
+      title: siteName,
+      description: siteDescription,
+      openGraph: {
+        title: siteName,
+        description: siteDescription,
+        type: "website",
+        locale: "en_IN",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: siteName,
+        description: siteDescription,
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Property Portal - Luxury Real Estate",
+      description: "B2B Real Estate Portal for viewing projects, price trends, and inventory",
+    };
+  }
+}
+
+export default async function HomePage() {
+  // Fetch categories for navigation (with error handling) - only show in menu
+  let categories: Array<{ id: string; name: string; slug: string }> = [];
+  try {
+    await prisma.$connect();
+    const allCategories = await prisma.category.findMany({
+      orderBy: { order: "asc" },
+    });
+    // Filter by showInMenu if the field exists, otherwise show all
+    categories = allCategories.filter((cat: any) => cat.showInMenu !== false);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    // Database might not be connected, continue with empty array
+  }
+
+  // Fetch featured properties (with error handling)
+  let featuredProperties: any[] = [];
+  try {
+    featuredProperties = await prisma.property.findMany({
+      where: { isFeatured: true, isHidden: false },
+      take: 8,
+      include: {
+        builder: true,
+        location: true,
+        priceHistory: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Error fetching featured properties:", error);
+    // Continue with empty array
+  }
+
+  // Fetch slider images (with error handling)
+  let sliderImages: any[] = [];
+  try {
+    sliderImages = await prisma.sliderImage.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+  } catch (error) {
+    console.error("Error fetching slider images:", error);
+    // Continue with empty array
+  }
+
+  // Get site settings for contact info (with error handling)
+  let email: string | undefined;
+  let phone: string | undefined;
+  let socialLinks: Array<{ name: string; url: string }> = [];
+
+  try {
+    const emailSetting = await prisma.siteSettings.findUnique({
+      where: { key: "contact_email" },
+    });
+    const phoneSetting = await prisma.siteSettings.findUnique({
+      where: { key: "contact_phone" },
+    });
+    const socialLinksSetting = await prisma.siteSettings.findUnique({
+      where: { key: "social_links" },
+    });
+
+    email = emailSetting?.value as string | undefined;
+    phone = phoneSetting?.value as string | undefined;
+    socialLinks = (socialLinksSetting?.value as Array<{ name: string; url: string }>) || [];
+  } catch (error) {
+    console.error("Error fetching site settings:", error);
+    // Use defaults
+  }
+
+  return (
+    <div className="fixed inset-0 w-full h-screen overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/images/background.jpg"
+          alt="Background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Fallback gradient if image doesn't exist */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-30" />
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
+
+      {/* Content - Flexbox layout to fit screen */}
+      <div className="relative z-10 h-full flex flex-col">
+        {/* Header - Logo (Left), Search (Center), Email/Phone (Right) - Fully Transparent */}
+        <Header email={email || "hello@oliofly.com"} phone={phone || "+919999999999"} />
+        
+        {/* Menu Bar - Categories (Left), Social Icons + Burger Menu (Right) - Blurred Background */}
+        <Navigation categories={categories} socialLinks={socialLinks} />
+
+        {/* Main Content - Hero + Featured Properties or Property Listings */}
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center" style={{ paddingTop: '100px' }}><div className="text-white/60">Loading...</div></div>}>
+          <HomeContent
+            categories={categories}
+            featuredProperties={featuredProperties}
+          />
+        </Suspense>
+
+        {/* Footer - Bottom Slider */}
+        <Footer images={sliderImages} />
+      </div>
+
+      {/* Structured Data - JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "RealEstateAgent",
+            "name": "Property Portal",
+            "description": "B2B Real Estate Portal for viewing projects, price trends, and inventory",
+            "url": typeof window !== "undefined" ? window.location.origin : "",
+            "telephone": phone || "+919999999999",
+            "email": email || "hello@oliofly.com",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "IN",
+            },
+            "sameAs": socialLinks.map((link: { url: string }) => link.url),
+          }),
+        }}
+      />
+    </div>
+  );
+}
+
