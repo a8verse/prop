@@ -6,7 +6,7 @@
     "start": "node server.js",
     "lint": "next lint",
     "deploy": "./scripts/deploy.sh"
-  }
+  },
 {
   "name": "property-portal",
   "version": "0.1.0",
