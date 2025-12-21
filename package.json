@@ -7,8 +7,7 @@
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "node server.js",
-    "lint": "next lint",
-    "deploy": "./scripts/deploy.sh"
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "14.2.0",
