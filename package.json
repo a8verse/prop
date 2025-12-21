@@ -1,17 +1,9 @@
 {
-  "scripts": {
-    "postinstall": "prisma generate",
-    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
-    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
-    "start": "node server.js",
-    "lint": "next lint",
-    "deploy": "./scripts/deploy.sh"
-  },
-{
   "name": "property-portal",
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "node server.js",
@@ -47,4 +39,3 @@
     "eslint-config-next": "^14.2.0"
   }
 }
-
