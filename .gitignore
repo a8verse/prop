@@ -36,5 +36,11 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations
+prisma/migrations
 
+# IDE
+.vscode
+.idea
+
+# Don't ignore package-lock.json - we need it for consistent builds
+# package-lock.json
