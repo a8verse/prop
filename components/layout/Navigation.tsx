@@ -79,7 +79,7 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
 
   return (
     <>
-      <nav className="w-full backdrop-blur-custom bg-black/30 border-b border-white/10 z-40 absolute left-0" style={{ top: '60px' }}>
+      <nav className="w-full backdrop-blur-custom bg-black/30 border-b border-white/10 z-40 fixed left-0" style={{ top: '60px' }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-1.5">
           {/* Mobile Layout */}
           <div className="flex md:hidden items-center justify-between">
