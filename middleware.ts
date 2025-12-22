@@ -10,7 +10,7 @@ export default withAuth(
 
     // Admin routes
     if (req.nextUrl.pathname.startsWith("/dashboard") && !isAdmin) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/login/admin", req.url));
     }
 
     // Channel Partner routes
