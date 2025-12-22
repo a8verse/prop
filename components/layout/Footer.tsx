@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 interface SliderImage {
@@ -123,23 +122,29 @@ export default function Footer({ images = [] }: FooterProps) {
                 className="block h-full"
               >
                 <div className="relative w-full h-full overflow-hidden">
-                  <Image
+                  <img
                     src={image.imageUrl}
                     alt={image.title || "Slider image"}
-                    fill
-                    className="object-cover hover:scale-110 transition-transform duration-300"
-                    unoptimized
+                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      console.error('Slider image failed to load:', image.imageUrl);
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 </div>
               </Link>
             ) : (
               <div className="relative w-full h-full overflow-hidden">
-                <Image
+                <img
                   src={image.imageUrl}
                   alt={image.title || "Slider image"}
-                  fill
-                  className="object-cover"
-                  unoptimized
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    console.error('Slider image failed to load:', image.imageUrl);
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
               </div>
             )}
