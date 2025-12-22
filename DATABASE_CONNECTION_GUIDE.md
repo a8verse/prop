@@ -283,3 +283,4 @@ PlanetScale offers free MySQL databases with external access:
 - Vercel Support: [vercel.com/support](https://vercel.com/support)
 - Database Issues: Contact Hostinger about external connections
 
+
