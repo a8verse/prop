@@ -128,6 +128,11 @@ export default function Footer({ images = [] }: FooterProps) {
                     alt={image.title || "Slider image"}
                     fill
                     className="object-cover hover:scale-110 transition-transform duration-300"
+                    unoptimized
+                    onError={(e) => {
+                      console.error('Image load error:', image.imageUrl);
+                      (e.target as HTMLImageElement).src = '/images/background.jpg';
+                    }}
                   />
                 </div>
               </Link>
@@ -138,6 +143,11 @@ export default function Footer({ images = [] }: FooterProps) {
                   alt={image.title || "Slider image"}
                   fill
                   className="object-cover"
+                  unoptimized
+                  onError={(e) => {
+                    console.error('Image load error:', image.imageUrl);
+                    (e.target as HTMLImageElement).src = '/images/background.jpg';
+                  }}
                 />
               </div>
             )}

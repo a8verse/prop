@@ -18,14 +18,26 @@ export default function AdminLayout({
   // All hooks must be called before any conditional returns
   useEffect(() => {
     if (status === "loading") return;
+    
+    // Add timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (status === "loading") {
+        console.error("Session loading timeout");
+      }
+    }, 10000); // 10 second timeout
+    
     if (!session) {
+      clearTimeout(timeout);
       router.push("/login/admin");
       return;
     }
-    if (session.user.role !== "ADMIN") {
+    if ((session.user as any)?.role !== "ADMIN") {
+      clearTimeout(timeout);
       router.push("/login/admin");
       return;
     }
+    
+    return () => clearTimeout(timeout);
   }, [session, status, router]);
 
   useEffect(() => {
