@@ -42,5 +42,9 @@ prisma/migrations
 .vscode
 .idea
 
+# Documentation files (keep README.md)
+*.md
+!README.md
+
 # Don't ignore package-lock.json - we need it for consistent builds
 # package-lock.json
