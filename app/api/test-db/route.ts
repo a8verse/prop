@@ -2,6 +2,27 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  // Parse DATABASE_URL to check format
+  const dbUrl = process.env.DATABASE_URL || "";
+  let dbUrlParsed: any = null;
+  try {
+    if (dbUrl) {
+      const url = new URL(dbUrl.replace(/^mysql:\/\//, "http://"));
+      dbUrlParsed = {
+        protocol: "mysql",
+        username: url.username,
+        host: url.hostname,
+        port: url.port || "3306",
+        database: url.pathname.replace("/", ""),
+        passwordLength: url.password ? url.password.length : 0,
+        passwordContainsAt: url.password?.includes("@") || false,
+        passwordContainsPercent: url.password?.includes("%") || false,
+      };
+    }
+  } catch (e) {
+    // URL parsing failed
+  }
+
   const diagnostics: any = {
     timestamp: new Date().toISOString(),
     databaseUrl: {
@@ -11,6 +32,8 @@ export async function GET() {
         : "Not set",
       hasSpecialChars: process.env.DATABASE_URL?.includes("@") && 
                       process.env.DATABASE_URL?.split("@").length > 2,
+      parsed: dbUrlParsed,
+      rawLength: process.env.DATABASE_URL?.length || 0,
     },
     connection: {
       status: "unknown",
