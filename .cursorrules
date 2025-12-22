@@ -1,0 +1,37 @@
+# Cursor AI Rules for Property Portal Project
+
+## Git Workflow
+- Always commit changes with descriptive messages
+- Push to GitHub after committing
+- Use conventional commit messages: "feat:", "fix:", "docs:", "refactor:"
+- Never commit sensitive data (.env files, passwords, etc.)
+
+## Code Style
+- Use TypeScript for type safety
+- Follow Next.js 14 App Router conventions
+- Use Tailwind CSS for styling
+- Maintain luxury black theme with gold/amber accents
+
+## Database
+- Use Prisma ORM for database operations
+- Always handle errors gracefully
+- Use transactions for multi-step operations
+- Validate data before database operations
+
+## File Structure
+- Keep components in `/components` directory
+- API routes in `/app/api` directory
+- Use route groups for organization: `(admin)`, `(auth)`, `(public)`
+
+## Security
+- Never expose API keys or secrets
+- Validate user input
+- Use NextAuth for authentication
+- Implement proper role-based access control
+
+## Performance
+- Use dynamic imports for large components
+- Optimize images with Next.js Image component
+- Implement proper caching strategies
+- Use Suspense boundaries where needed
+
