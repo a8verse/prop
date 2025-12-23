@@ -89,11 +89,18 @@ export default function PropertyDetailContent({ property }: PropertyDetailConten
     return `₹${price.toLocaleString('en-IN')}`;
   };
 
+  // Format dates safely - handle both Date objects and ISO strings
+  const formatDate = (dateInput: Date | string): string => {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+  };
+
   const chartData = property.priceHistory
     .slice()
     .reverse()
     .map((history, index) => ({
-      date: new Date(history.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+      date: formatDate(history.createdAt),
       price: history.price,
       index,
     }));
@@ -259,7 +266,7 @@ export default function PropertyDetailContent({ property }: PropertyDetailConten
                       </div>
                       <div className="text-white font-semibold">{rating.user.name || "Anonymous"}</div>
                       <div className="text-white/60 text-sm">
-                        {new Date(rating.createdAt).toLocaleDateString()}
+                        {formatDate(rating.createdAt)}
                       </div>
                     </div>
                     {rating.comment && (
