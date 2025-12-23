@@ -217,10 +217,16 @@ function GeneralSettings() {
       const heroData = heroRes.ok ? await heroRes.json() : null;
       const backgroundData = backgroundRes.ok ? await backgroundRes.json() : null;
 
+      // Handle logo - can be base64 string or object
+      const logoValue = logoData?.value;
+      const logoUrl = typeof logoValue === 'string' && logoValue.startsWith('data:')
+        ? logoValue
+        : (typeof logoValue === 'object' && logoValue !== null ? logoValue.logo : logoValue) || "";
+
       setFormData({
-        logo: logoData?.value?.logo || logoData?.value || "",
-        logoBgColor: logoData?.value?.logoBgColor || logoData?.logoBgColor || "#eae5d7",
-        logoBgTransparent: logoData?.value?.logoBgTransparent || logoData?.logoBgTransparent || false,
+        logo: logoUrl,
+        logoBgColor: (typeof logoValue === 'object' && logoValue !== null) ? (logoValue.logoBgColor || "#eae5d7") : "#eae5d7",
+        logoBgTransparent: (typeof logoValue === 'object' && logoValue !== null) ? (logoValue.logoBgTransparent || false) : false,
         contactEmail: emailData?.value || "hello@oliofly.com",
         contactPhone: phoneData?.value || "+919999999999",
         heroText: heroData?.value?.heroText || heroData?.heroText || "Live The Luxury You Deserve",
@@ -323,11 +329,13 @@ function GeneralSettings() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             key: "logo",
-            value: {
-              logo: formData.logo,
-              logoBgColor: formData.logoBgColor,
-              logoBgTransparent: formData.logoBgTransparent,
-            },
+            value: formData.logo.startsWith('data:') 
+              ? formData.logo 
+              : {
+                  logo: formData.logo,
+                  logoBgColor: formData.logoBgColor,
+                  logoBgTransparent: formData.logoBgTransparent,
+                },
           }),
         }),
         fetch("/api/site-settings", {
