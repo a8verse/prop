@@ -184,7 +184,7 @@ export default function HomeContent({
   }, []);
 
   return (
-    <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4" style={{ paddingTop: '100px' }}>
+    <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4 mb-4 sm:mb-6 md:mb-8" style={{ paddingTop: '100px' }}>
       <div className="max-w-7xl mx-auto w-full h-full flex flex-col lg:flex-row gap-3 md:gap-6 lg:gap-8">
         {/* Hero Section - Left (flexible width) */}
         <div className="flex-1 flex items-center h-full min-h-0">

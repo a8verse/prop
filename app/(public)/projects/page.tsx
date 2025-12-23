@@ -126,9 +126,9 @@ export default async function ProjectsPage({ searchParams }: Props) {
         <Header email={email} phone={phone} />
         <Navigation categories={categories} socialLinks={socialLinks} />
 
-        <main className="pt-24 pb-8 min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <h1 className="text-4xl font-bold text-white mb-6">Property Listings</h1>
+        <main className="pt-24 sm:pt-28 md:pt-32 pb-8 min-h-screen">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">Property Listings</h1>
             <PropertyList
               properties={properties}
               categories={categories}

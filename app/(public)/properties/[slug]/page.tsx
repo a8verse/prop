@@ -177,7 +177,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         <Header email={email || "hello@oliofly.com"} phone={phone || "+919999999999"} />
         <Navigation categories={categories} socialLinks={socialLinks} />
 
-        <main className="pt-32 sm:pt-36 md:pt-40 pb-8 min-h-screen">
+        <main className="pt-24 sm:pt-28 md:pt-32 lg:pt-36 xl:pt-40 pb-4 sm:pb-6 md:pb-8 min-h-screen px-3 sm:px-4 md:px-6 lg:px-8">
           <PropertyDetailContent property={property} />
         </main>
 

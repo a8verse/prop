@@ -43,7 +43,6 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
             return <StarOutlineIcon key={star} className="w-3 h-3 text-gray-400" />;
           }
         })}
-        <span className="text-[10px] text-gray-700 ml-1">{rating.toFixed(1)}</span>
       </div>
     );
   };
@@ -95,8 +94,8 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
                     </span>
                   </div>
                   
-                  {/* Star Rating */}
-                  <div className="flex-shrink-0">
+                  {/* Star Rating - with gap from text */}
+                  <div className="flex-shrink-0 ml-2 md:ml-3">
                     {renderStars(builder.rating)}
                   </div>
                 </div>

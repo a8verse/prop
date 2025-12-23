@@ -159,19 +159,26 @@ export default function Header({ email, phone, logo: logoProp, logoBgColor: logo
               className="flex-1 max-w-sm lg:max-w-md mx-4 lg:mx-8 relative"
               style={{ position: 'relative', zIndex: 100 }}
             >
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none" style={{ isolation: 'isolate' }}>
                 <svg 
-                  className="w-5 h-5 text-white/70" 
+                  className="w-5 h-5 text-white/90" 
                   fill="none" 
                   stroke="currentColor" 
-                  strokeWidth={2} 
+                  strokeWidth={2.5} 
                   viewBox="0 0 24 24"
                   shapeRendering="geometricPrecision"
+                  style={{ 
+                    filter: 'none',
+                    WebkitFilter: 'none',
+                    backdropFilter: 'none',
+                    WebkitBackdropFilter: 'none',
+                  }}
                 >
                   <path 
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    style={{ filter: 'none' }}
                   />
                 </svg>
               </div>
@@ -187,6 +194,7 @@ export default function Header({ email, phone, logo: logoProp, logoBgColor: logo
                 }}
                 placeholder="Search properties..."
                 className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/60 focus:outline-none focus:border-primary focus:bg-white/15 relative z-10"
+                style={{ backdropFilter: 'blur(8px)' }}
               />
               <LiveSearchDropdown
                 searchQuery={searchQuery}
