@@ -159,8 +159,8 @@ export default function HomeContent({
           <HeroSection />
         </div>
 
-        {/* Featured Builders - Right (1/5 on desktop, reduced width) */}
-        <div className="lg:col-span-1 flex items-center h-full min-h-0 bg-white/10 rounded max-w-xs">
+        {/* Featured Builders - Right (1/5 on desktop, adjustable width) */}
+        <div className="lg:col-span-1 flex items-center h-full min-h-0">
           <FeaturedProperties builders={featuredBuilders} />
         </div>
       </div>

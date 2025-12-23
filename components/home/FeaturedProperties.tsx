@@ -22,9 +22,9 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
       return (
         <div className="flex items-center gap-0.5">
           {[1, 2, 3, 4, 5].map((star) => (
-            <StarOutlineIcon key={star} className="w-3 h-3 text-white/40" />
+            <StarOutlineIcon key={star} className="w-3 h-3 text-gray-400" />
           ))}
-          <span className="text-[10px] text-white/40 ml-1">No rating</span>
+          <span className="text-[10px] text-gray-500 ml-1">No rating</span>
         </div>
       );
     }
@@ -36,29 +36,24 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => {
           if (star <= fullStars) {
-            return <StarIcon key={star} className="w-3 h-3 text-yellow-400 fill-yellow-400" />;
+            return <StarIcon key={star} className="w-3 h-3 text-yellow-500 fill-yellow-500" />;
           } else if (star === fullStars + 1 && hasHalfStar) {
-            return <StarIcon key={star} className="w-3 h-3 text-yellow-400 fill-yellow-400 opacity-50" />;
+            return <StarIcon key={star} className="w-3 h-3 text-yellow-500 fill-yellow-500 opacity-50" />;
           } else {
-            return <StarOutlineIcon key={star} className="w-3 h-3 text-white/40" />;
+            return <StarOutlineIcon key={star} className="w-3 h-3 text-gray-400" />;
           }
         })}
-        <span className="text-[10px] text-white/60 ml-1">{rating.toFixed(1)}</span>
+        <span className="text-[10px] text-gray-700 ml-1">{rating.toFixed(1)}</span>
       </div>
     );
   };
 
   return (
-    <div className="bg-white/10 p-2 md:p-3 lg:p-4 h-full max-h-[300px] sm:max-h-[400px] md:max-h-[500px] flex flex-col w-full mt-4 sm:mt-8 md:mt-16 lg:mt-20 shadow-lg">
-      <div className="mb-2 pb-2 border-b border-white/20">
-        <h3 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider">
-          Top Builders
-        </h3>
-      </div>
+    <div className="bg-[#f5f5f0] p-2 md:p-3 lg:p-4 h-full max-h-[300px] sm:max-h-[400px] md:max-h-[500px] flex flex-col w-full my-4 sm:my-6 md:my-8 shadow-lg rounded-none">
       {/* Mobile: Horizontal Scroll, Desktop: Vertical Scroll */}
       <div className="flex-1 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden space-y-1 md:space-y-1.5 pr-1 md:pr-1">
         {builders.length === 0 ? (
-          <div className="text-white/60 text-center py-8 text-sm">
+          <div className="text-gray-600 text-center py-8 text-sm">
             No builders available
           </div>
         ) : (
@@ -67,9 +62,9 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
               <Link
                 key={builder.id}
                 href={`/projects?builder=${encodeURIComponent(builder.name)}`}
-                className="bg-transparent border-b md:border-b border-white/20 border-r md:border-r-0 py-1.5 md:py-2 px-2 hover:bg-white/10 transition-colors min-w-[200px] sm:min-w-[250px] md:min-w-0 md:w-full cursor-pointer"
+                className="bg-transparent border-b md:border-b border-gray-300 border-r md:border-r-0 py-1.5 md:py-2 px-2 hover:bg-gray-200/50 transition-colors w-full cursor-pointer"
               >
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-1.5 md:gap-2 text-[10px] sm:text-xs md:text-xs text-white w-full">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-1.5 md:gap-2 text-[10px] sm:text-xs md:text-xs text-black w-full">
                   {/* Builder Logo */}
                   {builder.logo && (
                     <div className="relative w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
@@ -82,9 +77,9 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
                     </div>
                   )}
                   
-                  {/* Builder Name */}
+                  {/* Builder Name - Full width, wraps to fit */}
                   <div className="flex-1 min-w-0">
-                    <span className="font-medium block md:whitespace-nowrap overflow-hidden text-ellipsis">
+                    <span className="font-medium block break-words">
                       {builder.name}
                     </span>
                   </div>
