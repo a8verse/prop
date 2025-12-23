@@ -313,6 +313,13 @@ function GeneralSettings() {
     e.preventDefault();
     setLoading(true);
     try {
+      // Save logo - always store as object to preserve background color and transparent settings
+      const logoValue = {
+        logo: formData.logo,
+        logoBgColor: formData.logoBgColor,
+        logoBgTransparent: formData.logoBgTransparent,
+      };
+
       await Promise.all([
         fetch("/api/site-settings", {
           method: "POST",
@@ -324,20 +331,7 @@ function GeneralSettings() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: "contact_phone", value: formData.contactPhone }),
         }),
-        // Save logo - always store as object to preserve background color and transparent settings
-        const logoValue = formData.logo.startsWith('data:') 
-          ? {
-              logo: formData.logo,
-              logoBgColor: formData.logoBgColor,
-              logoBgTransparent: formData.logoBgTransparent,
-            }
-          : {
-              logo: formData.logo,
-              logoBgColor: formData.logoBgColor,
-              logoBgTransparent: formData.logoBgTransparent,
-            };
-        
-        await fetch("/api/site-settings", {
+        fetch("/api/site-settings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
