@@ -67,57 +67,73 @@ export default function Header({ email, phone, logo: logoProp, logoBgColor: logo
     <>
       <header className="w-full fixed top-0 left-0 z-50 px-3 sm:px-4 md:px-8 py-2 sm:py-3 bg-transparent">
         <div className="max-w-7xl mx-auto">
-          {/* Mobile Layout - Stacked */}
-          <div className="flex md:hidden flex-col gap-2">
-            {/* Top Row: Logo and Search Icon */}
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center">
-                {hasLogo ? (
-                  <div 
-                    className="relative h-8 w-24 rounded px-2 flex items-center justify-center"
-                    style={{
-                      backgroundColor: logoBgTransparent ? 'transparent' : logoBgColor,
-                    }}
-                  >
-                    {logoPath.startsWith('data:') ? (
-                      <img
-                        src={logoPath}
-                        alt="oliolly"
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <Image
-                        src={logoPath}
-                        alt="oliolly"
-                        fill
-                        className="object-contain"
-                        priority
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-primary text-xl font-bold">oliolly</div>
-                )}
-              </Link>
-              <button
-                onClick={() => setShowMobileSearch(true)}
-                className="p-2 text-white/80 hover:text-white transition-colors"
-                aria-label="Search"
-              >
+          {/* Mobile Layout - Horizontal */}
+          <div className="flex md:hidden items-center justify-between gap-2">
+            {/* Logo */}
+            <Link href="/" className="flex items-center flex-shrink-0">
+              {hasLogo ? (
+                <div 
+                  className="relative h-8 w-24 rounded px-2 flex items-center justify-center"
+                  style={{
+                    backgroundColor: logoBgTransparent ? 'transparent' : logoBgColor,
+                  }}
+                >
+                  {logoPath.startsWith('data:') ? (
+                    <img
+                      src={logoPath}
+                      alt="oliolly"
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src={logoPath}
+                      alt="oliolly"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="text-primary text-xl font-bold">oliolly</div>
+              )}
+            </Link>
+            
+            {/* Search Bar - Right Side */}
+            <div className="flex-1 max-w-[200px] relative">
+              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
                 <svg 
-                  className="w-6 h-6" 
+                  className="w-4 h-4 text-white/70" 
                   fill="none" 
                   stroke="currentColor" 
-                  strokeWidth={2} 
+                  strokeWidth={2.5} 
                   viewBox="0 0 24 24"
+                  shapeRendering="geometricPrecision"
                 >
                   <path 
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-              </button>
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  if (searchQuery.trim().length >= 2) {
+                    // The useEffect will handle showing the dropdown
+                  }
+                }}
+                placeholder="Search..."
+                className="w-full pl-8 pr-3 py-1.5 text-sm bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/60 focus:outline-none focus:border-primary focus:bg-white/15"
+              />
+              <LiveSearchDropdown
+                searchQuery={searchQuery}
+                onSelect={() => setSearchQuery("")}
+              />
             </div>
           </div>
 

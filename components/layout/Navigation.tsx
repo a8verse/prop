@@ -79,7 +79,7 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
 
   return (
     <>
-      <nav className="w-full backdrop-blur-custom bg-black/30 border-b border-white/10 z-40 fixed left-0" style={{ top: '60px' }}>
+      <nav className="w-full backdrop-blur-custom bg-black/30 border-b border-white/10 z-40 fixed left-0" style={{ top: navTop }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-1.5">
           {/* Mobile Layout */}
           <div className="flex md:hidden items-center justify-between">
@@ -104,10 +104,8 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
                 )}
               </svg>
             </button>
-            {session ? (
+            {session && (
               <UserProfileDropdown />
-            ) : (
-              <div className="text-white/60 text-xs">Menu</div>
             )}
           </div>
 
@@ -216,7 +214,7 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
         <div 
           ref={mobileMenuRef}
           className="fixed inset-0 z-[9998] bg-black/95 backdrop-blur-md md:hidden"
-          style={{ top: '100px' }}
+          style={{ top: navTop }}
         >
           <div className="flex flex-col h-full overflow-y-auto">
             {/* Categories Section */}

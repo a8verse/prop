@@ -164,11 +164,11 @@ export default function HomeContent({
     ? Math.max(...featuredBuilders.map(b => b.name.length))
     : 0;
   
-  // Calculate column width based on longest builder name (min 200px, max 400px)
-  // Formula: base width + (name length * character width) + padding
+  // Calculate column width based on longest builder name (min 280px, max 450px)
+  // Formula: base width + (name length * character width) + padding + space for stars
   const columnWidth = maxBuilderNameLength > 0
-    ? Math.min(Math.max(maxBuilderNameLength * 7 + 100, 200), 400)
-    : 250;
+    ? Math.min(Math.max(maxBuilderNameLength * 8 + 150, 280), 450)
+    : 320;
 
   const [windowWidth, setWindowWidth] = useState(getWindowWidth());
 
@@ -184,7 +184,7 @@ export default function HomeContent({
   }, []);
 
   return (
-    <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4 mb-4 sm:mb-6 md:mb-8" style={{ paddingTop: '100px' }}>
+    <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4 mb-4 sm:mb-6 md:mb-8" style={{ paddingTop: windowWidth < 768 ? '140px' : '100px' }}>
       <div className="max-w-7xl mx-auto w-full h-full flex flex-col lg:flex-row gap-3 md:gap-6 lg:gap-8">
         {/* Hero Section - Left (flexible width) */}
         <div className="flex-1 flex items-center h-full min-h-0">
@@ -193,7 +193,7 @@ export default function HomeContent({
 
         {/* Featured Builders - Right (auto width based on content) */}
         <div 
-          className="flex items-center h-full min-h-0 flex-shrink-0"
+          className="flex items-center h-full min-h-0 flex-shrink-0 w-full lg:w-auto"
           style={{ 
             width: windowWidth >= 1024 ? `${columnWidth}px` : '100%',
             maxWidth: '100%' 
