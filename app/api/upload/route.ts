@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -13,6 +14,9 @@ try {
   // Sharp not installed - will skip optimization
   sharp = null;
 }
+
+// Check if we're in a serverless environment (Vercel)
+const isServerless = process.env.VERCEL === "1" || !existsSync(join(process.cwd(), "public"));
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,24 +46,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size exceeds 5MB limit." }, { status: 400 });
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadDir = join(process.cwd(), "public", "images", folder);
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const filename = `${timestamp}_${originalName}`;
-    const filepath = join(uploadDir, filename);
-
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let buffer = Buffer.from(bytes);
 
     // Optimize image if it's an image file and sharp is available
-    let finalBuffer = buffer;
     if (file.type.startsWith("image/") && sharp) {
       try {
         const image = sharp(buffer);
@@ -76,23 +67,68 @@ export async function POST(request: NextRequest) {
 
         // Optimize based on format
         if (file.type === "image/jpeg" || file.type === "image/jpg") {
-          finalBuffer = await processedImage.jpeg({ quality: 85, mozjpeg: true }).toBuffer();
+          buffer = await processedImage.jpeg({ quality: 85, mozjpeg: true }).toBuffer();
         } else if (file.type === "image/png") {
-          finalBuffer = await processedImage.png({ quality: 85, compressionLevel: 9 }).toBuffer();
+          buffer = await processedImage.png({ quality: 85, compressionLevel: 9 }).toBuffer();
         } else if (file.type === "image/webp") {
-          finalBuffer = await processedImage.webp({ quality: 85 }).toBuffer();
+          buffer = await processedImage.webp({ quality: 85 }).toBuffer();
         } else {
-          finalBuffer = await processedImage.toBuffer();
+          buffer = await processedImage.toBuffer();
         }
       } catch (optimizeError) {
         console.error("Image optimization error (using original):", optimizeError);
         // Use original buffer if optimization fails
-        finalBuffer = buffer;
       }
     }
 
+    // For logo and background images, store as base64 in database (works in serverless)
+    if (type === "logo" || type === "background") {
+      const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+      
+      // Store in database
+      const settingKey = type === "logo" ? "logo" : "home_background_image";
+      await prisma.siteSettings.upsert({
+        where: { key: settingKey },
+        update: { value: base64Image },
+        create: { key: settingKey, value: base64Image },
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        url: base64Image,
+        path: base64Image,
+        filename: file.name,
+        storedInDatabase: true
+      });
+    }
+
+    // For other images (slider, avatars), try to save to filesystem if not serverless
+    if (isServerless) {
+      // In serverless, convert to base64 and return data URL
+      const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+      return NextResponse.json({ 
+        success: true, 
+        url: base64Image,
+        path: base64Image,
+        filename: file.name,
+        storedAsBase64: true
+      });
+    }
+
+    // Local development: save to filesystem
+    const uploadDir = join(process.cwd(), "public", "images", folder);
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true });
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const filename = `${timestamp}_${originalName}`;
+    const filepath = join(uploadDir, filename);
+
     // Save optimized file
-    await writeFile(filepath, finalBuffer);
+    await writeFile(filepath, buffer);
 
     // Return the public URL path
     const publicPath = `/images/${folder}/${filename}`;

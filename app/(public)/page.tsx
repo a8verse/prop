@@ -101,11 +101,12 @@ export default async function HomePage() {
     // Continue with empty array
   }
 
-  // Get site settings for contact info and background image (with error handling)
+  // Get site settings for contact info, logo, and background image (with error handling)
   let email: string | undefined;
   let phone: string | undefined;
   let socialLinks: Array<{ name: string; url: string }> = [];
   let homeBackgroundImage: string | undefined;
+  let logo: string | undefined;
 
   try {
     const emailSetting = await prisma.siteSettings.findUnique({
@@ -120,6 +121,9 @@ export default async function HomePage() {
     const backgroundImageSetting = await prisma.siteSettings.findUnique({
       where: { key: "home_background_image" },
     });
+    const logoSetting = await prisma.siteSettings.findUnique({
+      where: { key: "logo" },
+    });
 
     email = emailSetting?.value as string | undefined;
     phone = phoneSetting?.value as string | undefined;
@@ -129,6 +133,15 @@ export default async function HomePage() {
       homeBackgroundImage = typeof backgroundImageSetting.value === 'string' 
         ? backgroundImageSetting.value 
         : (backgroundImageSetting.value as any)?.imageUrl || undefined;
+    }
+
+    if (logoSetting?.value) {
+      const logoValue = logoSetting.value;
+      if (typeof logoValue === 'string') {
+        logo = logoValue;
+      } else if (typeof logoValue === 'object' && logoValue !== null) {
+        logo = (logoValue as any).logo || undefined;
+      }
     }
   } catch (error) {
     console.error("Error fetching site settings:", error);
@@ -140,7 +153,7 @@ export default async function HomePage() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src={homeBackgroundImage || "/images/background.jpg"}
+          src={homeBackgroundImage && homeBackgroundImage.startsWith('data:') ? homeBackgroundImage : (homeBackgroundImage || "/images/background.jpg")}
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -152,7 +165,7 @@ export default async function HomePage() {
       {/* Content - Flexbox layout to fit screen */}
       <div className="relative z-10 h-full flex flex-col">
         {/* Header - Logo (Left), Search (Center), Email/Phone (Right) - Fully Transparent */}
-        <Header email={email || "hello@oliofly.com"} phone={phone || "+919999999999"} />
+        <Header email={email || "hello@oliofly.com"} phone={phone || "+919999999999"} logo={logo} />
         
         {/* Menu Bar - Categories (Left), Social Icons + Burger Menu (Right) - Blurred Background */}
         <Navigation categories={categories} socialLinks={socialLinks} />

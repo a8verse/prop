@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,13 +10,36 @@ import MobileSearchModal from "@/components/search/MobileSearchModal";
 interface HeaderProps {
   email?: string;
   phone?: string;
+  logo?: string;
 }
 
-export default function Header({ email, phone }: HeaderProps) {
+export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [logo, setLogo] = useState<string | undefined>(logoProp);
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch logo from database if not provided via props
+  useEffect(() => {
+    if (!logoProp) {
+      fetch("/api/site-settings?key=logo")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.value) {
+            const logoValue = typeof data.value === 'string' 
+              ? data.value 
+              : (data.value as any)?.logo;
+            if (logoValue) {
+              setLogo(logoValue);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching logo:", error);
+        });
+    }
+  }, [logoProp]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {
@@ -24,9 +47,9 @@ export default function Header({ email, phone }: HeaderProps) {
     }
   };
 
-  // Check if logo exists
-  const logoPath = "/logo.png";
-  const hasLogo = true; // Will be replaced with actual check if needed
+  // Use logo from state or fallback to default
+  const logoPath = logo || "/logo.png";
+  const hasLogo = !!logo || true; // Show logo if provided or use default
 
   return (
     <>
@@ -39,13 +62,21 @@ export default function Header({ email, phone }: HeaderProps) {
               <Link href="/" className="flex items-center">
                 {hasLogo ? (
                   <div className="relative h-8 w-24 bg-[#eae5d7] rounded px-2 flex items-center justify-center">
-                    <Image
-                      src={logoPath}
-                      alt="oliolly"
-                      fill
-                      className="object-contain"
-                      priority
-                    />
+                    {logoPath.startsWith('data:') ? (
+                      <img
+                        src={logoPath}
+                        alt="oliolly"
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={logoPath}
+                        alt="oliolly"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="text-primary text-xl font-bold">oliolly</div>
@@ -79,13 +110,21 @@ export default function Header({ email, phone }: HeaderProps) {
             <Link href="/" className="flex items-center space-x-2">
               {hasLogo ? (
                 <div className="relative h-10 w-32 bg-[#eae5d7] rounded px-2 flex items-center justify-center">
-                  <Image
-                    src={logoPath}
-                    alt="oliolly"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
+                  {logoPath.startsWith('data:') ? (
+                    <img
+                      src={logoPath}
+                      alt="oliolly"
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <Image
+                      src={logoPath}
+                      alt="oliolly"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
+                  )}
                 </div>
               ) : (
                 <div className="text-primary text-2xl font-bold">oliolly</div>
