@@ -8,13 +8,13 @@ import PropertyList from "@/components/property/PropertyList";
 
 interface HomeContentProps {
   categories: Array<{ id: string; name: string; slug: string }>;
-  featuredProperties: any[];
+  builders: Array<{ id: string; name: string; logo: string | null; rating: number | null }>;
   initialShowListings?: boolean;
 }
 
 export default function HomeContent({
   categories,
-  featuredProperties,
+  builders,
   initialShowListings = false,
 }: HomeContentProps) {
   const searchParams = useSearchParams();
@@ -153,15 +153,15 @@ export default function HomeContent({
 
   return (
     <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4" style={{ paddingTop: '100px' }}>
-      <div className="max-w-7xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 lg:gap-8">
-        {/* Hero Section - Left (2/3 on desktop) */}
-        <div className="lg:col-span-2 flex items-center h-full min-h-0">
+      <div className="max-w-7xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-6 lg:gap-8">
+        {/* Hero Section - Left (4/5 on desktop) */}
+        <div className="lg:col-span-4 flex items-center h-full min-h-0">
           <HeroSection />
         </div>
 
-        {/* Featured Properties - Right (1/3 on desktop) */}
-        <div className="lg:col-span-1 flex items-center h-full min-h-0 bg-white/10 rounded">
-          <FeaturedProperties properties={featuredProperties} />
+        {/* Featured Builders - Right (1/5 on desktop, reduced width) */}
+        <div className="lg:col-span-1 flex items-center h-full min-h-0 bg-white/10 rounded max-w-xs">
+          <FeaturedProperties builders={builders} />
         </div>
       </div>
     </div>

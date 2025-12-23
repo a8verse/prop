@@ -191,8 +191,11 @@ function GeneralSettings() {
     heroText: "Live The Luxury You Deserve",
     ctaText: "Explore Properties",
     ctaLink: "/projects",
+    homeBackgroundImage: "",
   });
   const [loading, setLoading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBackground, setUploadingBackground] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -200,17 +203,19 @@ function GeneralSettings() {
 
   const fetchSettings = async () => {
     try {
-      const [emailRes, phoneRes, logoRes, heroRes] = await Promise.all([
+      const [emailRes, phoneRes, logoRes, heroRes, backgroundRes] = await Promise.all([
         fetch("/api/site-settings?key=contact_email"),
         fetch("/api/site-settings?key=contact_phone"),
         fetch("/api/site-settings?key=logo"),
         fetch("/api/site-settings?key=hero_section"),
+        fetch("/api/site-settings?key=home_background_image"),
       ]);
 
       const emailData = emailRes.ok ? await emailRes.json() : null;
       const phoneData = phoneRes.ok ? await phoneRes.json() : null;
       const logoData = logoRes.ok ? await logoRes.json() : null;
       const heroData = heroRes.ok ? await heroRes.json() : null;
+      const backgroundData = backgroundRes.ok ? await backgroundRes.json() : null;
 
       setFormData({
         logo: logoData?.value?.logo || logoData?.value || "",
@@ -221,9 +226,80 @@ function GeneralSettings() {
         heroText: heroData?.value?.heroText || heroData?.heroText || "Live The Luxury You Deserve",
         ctaText: heroData?.value?.ctaText || heroData?.ctaText || "Explore Properties",
         ctaLink: heroData?.value?.ctaLink || heroData?.ctaLink || "/projects",
+        homeBackgroundImage: backgroundData?.value || "",
       });
     } catch (error) {
       console.error("Error fetching settings:", error);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "logo");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData((prev) => ({ ...prev, logo: data.url }));
+      } else {
+        const error = await res.json();
+        alert(error.error || "Failed to upload logo");
+      }
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      alert("Failed to upload logo");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
+      return;
+    }
+
+    setUploadingBackground(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", "background");
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData((prev) => ({ ...prev, homeBackgroundImage: data.url }));
+      } else {
+        const error = await res.json();
+        alert(error.error || "Failed to upload background image");
+      }
+    } catch (error) {
+      console.error("Error uploading background:", error);
+      alert("Failed to upload background image");
+    } finally {
+      setUploadingBackground(false);
     }
   };
 
@@ -266,6 +342,14 @@ function GeneralSettings() {
             },
           }),
         }),
+        fetch("/api/site-settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: "home_background_image",
+            value: formData.homeBackgroundImage,
+          }),
+        }),
       ]);
       alert("Settings saved successfully!");
     } catch (error) {
@@ -288,15 +372,28 @@ function GeneralSettings() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Logo URL
+                Logo Image
               </label>
               <input
-                type="text"
-                value={formData.logo}
-                onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                placeholder="/logo.png"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                disabled={uploadingLogo}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary text-gray-900 bg-white"
               />
+              {uploadingLogo && (
+                <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+              )}
+              {formData.logo && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-1">Current logo:</p>
+                  <img
+                    src={formData.logo}
+                    alt="Logo preview"
+                    className="max-w-xs max-h-20 object-contain border border-gray-200 rounded"
+                  />
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -324,7 +421,7 @@ function GeneralSettings() {
                 onChange={(e) => setFormData({ ...formData, logoBgTransparent: e.target.checked })}
                 className="mr-2"
               />
-              <label className="text-sm text-gray-700">Transparent Background</label>
+              <label className="text-sm text-gray-700">No Background Color</label>
             </div>
           </div>
         </div>
@@ -397,6 +494,38 @@ function GeneralSettings() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary text-gray-900 bg-white"
                 placeholder="/projects"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Home Background Image */}
+        <div className="border-b border-gray-200 pb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Home Page Background</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Background Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBackgroundUpload}
+                disabled={uploadingBackground}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary text-gray-900 bg-white"
+              />
+              {uploadingBackground && (
+                <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+              )}
+              {formData.homeBackgroundImage && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 mb-1">Current background:</p>
+                  <img
+                    src={formData.homeBackgroundImage}
+                    alt="Background preview"
+                    className="max-w-md max-h-40 object-cover border border-gray-200 rounded"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

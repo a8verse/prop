@@ -21,7 +21,7 @@ export default function Footer({ images = [] }: FooterProps) {
   const animationFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
   const imageWidth = 100 / 6; // Each image takes 1/6 of the width (16.67%)
-  const scrollSpeed = 0.02; // Percentage to scroll per frame (adjust for speed)
+  const scrollSpeed = 0.08; // Percentage to scroll per frame (increased for faster movement)
 
   // Normalize URL - add https:// if missing
   const normalizeUrl = (url: string | null | undefined): string => {

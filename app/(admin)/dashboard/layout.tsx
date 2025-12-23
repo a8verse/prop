@@ -63,6 +63,7 @@ export default function AdminLayout({
     { href: "/dashboard/categories", label: "Categories" },
     { href: "/dashboard/channel-partners", label: "Channel Partners" },
     { href: "/dashboard/builders", label: "Builders" },
+    { href: "/dashboard/builders/ratings", label: "Builder Ratings" },
     { href: "/dashboard/visitors", label: "Visitors" },
     { href: "/dashboard/slider", label: "Slider" },
     { href: "/dashboard/social-media", label: "Social Media" },

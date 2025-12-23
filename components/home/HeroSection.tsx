@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 const heroTexts = [
   "BUYING PROPERTY",
@@ -48,21 +47,6 @@ export default function HeroSection() {
         </div>
         <div className="text-sm sm:text-base md:text-lg text-white/60">
           {heroTexts[3]}
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4 md:pt-6 lg:pt-8 justify-center md:justify-start">
-          <Link
-            href="/login?type=visitor"
-            className="px-6 md:px-8 py-3 md:py-3 bg-primary text-black font-bold text-sm sm:text-base md:text-lg rounded-lg hover:bg-primary-light transition-colors text-center shadow-lg min-h-[44px] flex items-center justify-center"
-          >
-            Just Login
-          </Link>
-          <Link
-            href="/projects"
-            className="px-6 md:px-8 py-3 md:py-3 border-2 border-white text-white font-bold text-sm sm:text-base md:text-lg rounded-lg hover:bg-white/20 hover:border-primary transition-colors text-center backdrop-blur-sm min-h-[44px] flex items-center justify-center"
-          >
-            Check Inventory
-          </Link>
         </div>
       </div>
     </div>

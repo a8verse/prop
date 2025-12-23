@@ -1,87 +1,101 @@
 "use client";
 
-import { ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/24/solid";
+import { StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon as StarOutlineIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import Image from "next/image";
 
-interface Property {
+interface Builder {
   id: string;
   name: string;
-  price: number;
-  builder: {
-    name: string;
-  };
-  priceHistory: Array<{
-    change: number | null;
-    isIncrease: boolean;
-  }>;
-  updatedAt: Date;
+  logo: string | null;
+  rating: number | null;
 }
 
 interface FeaturedPropertiesProps {
-  properties: Property[];
+  builders: Builder[];
 }
 
-export default function FeaturedProperties({ properties }: FeaturedPropertiesProps) {
-  const formatPrice = (price: number) => {
-    // Return exact amount with Indian number formatting
-    return `₹${price.toLocaleString('en-IN')}`;
+export default function FeaturedProperties({ builders }: FeaturedPropertiesProps) {
+  const renderStars = (rating: number | null) => {
+    if (!rating) {
+      return (
+        <div className="flex items-center gap-0.5">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <StarOutlineIcon key={star} className="w-3 h-3 text-white/40" />
+          ))}
+          <span className="text-[10px] text-white/40 ml-1">No rating</span>
+        </div>
+      );
+    }
+
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => {
+          if (star <= fullStars) {
+            return <StarIcon key={star} className="w-3 h-3 text-yellow-400 fill-yellow-400" />;
+          } else if (star === fullStars + 1 && hasHalfStar) {
+            return <StarIcon key={star} className="w-3 h-3 text-yellow-400 fill-yellow-400 opacity-50" />;
+          } else {
+            return <StarOutlineIcon key={star} className="w-3 h-3 text-white/40" />;
+          }
+        })}
+        <span className="text-[10px] text-white/60 ml-1">{rating.toFixed(1)}</span>
+      </div>
+    );
   };
 
   return (
     <div className="bg-white/10 p-2 md:p-3 lg:p-4 h-full max-h-[300px] sm:max-h-[400px] md:max-h-[500px] flex flex-col w-full mt-4 sm:mt-8 md:mt-16 lg:mt-20 shadow-lg">
+      <div className="mb-2 pb-2 border-b border-white/20">
+        <h3 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider">
+          Top Builders
+        </h3>
+      </div>
       {/* Mobile: Horizontal Scroll, Desktop: Vertical Scroll */}
       <div className="flex-1 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden space-y-1 md:space-y-1.5 pr-1 md:pr-1">
-        {properties.length === 0 ? (
+        {builders.length === 0 ? (
           <div className="text-white/60 text-center py-8 text-sm">
-            No featured properties available
+            No builders available
           </div>
         ) : (
           <div className="flex md:flex-col gap-2 md:gap-0 min-w-max md:min-w-0">
-            {properties.map((property) => {
-            const latestPriceChange = property.priceHistory[0];
-            const change = latestPriceChange?.change || 0;
-            const isIncrease = latestPriceChange?.isIncrease ?? true;
-            const percentage = change !== 0 ? `${Math.abs(change).toFixed(1)}%` : "";
-
-              return (
-                <div
-                  key={property.id}
-                  className="bg-transparent border-b md:border-b border-white/20 border-r md:border-r-0 py-1.5 md:py-2 px-2 hover:bg-white/10 transition-colors min-w-[200px] sm:min-w-[250px] md:min-w-0 md:w-full"
-                >
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-1.5 lg:gap-2 text-[10px] sm:text-xs md:text-xs text-white w-full">
-                    {/* Builder Name's Property Name */}
-                    <div className="flex-1 min-w-0">
-                      <span className="font-medium block md:whitespace-nowrap overflow-hidden text-ellipsis">
-                        {property.builder.name}&apos;s {property.name}
-                      </span>
+            {builders.map((builder) => (
+              <Link
+                key={builder.id}
+                href={`/projects?builder=${encodeURIComponent(builder.name)}`}
+                className="bg-transparent border-b md:border-b border-white/20 border-r md:border-r-0 py-1.5 md:py-2 px-2 hover:bg-white/10 transition-colors min-w-[200px] sm:min-w-[250px] md:min-w-0 md:w-full cursor-pointer"
+              >
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-1.5 md:gap-2 text-[10px] sm:text-xs md:text-xs text-white w-full">
+                  {/* Builder Logo */}
+                  {builder.logo && (
+                    <div className="relative w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
+                      <Image
+                        src={builder.logo}
+                        alt={builder.name}
+                        fill
+                        className="object-contain rounded"
+                      />
                     </div>
-                    
-                    {/* Price and Percentage Row */}
-                    <div className="flex items-center gap-2 md:gap-1.5">
-                      {/* Price */}
-                      <div className="text-primary font-semibold whitespace-nowrap flex-shrink-0 text-[10px] sm:text-xs md:text-xs">
-                        {formatPrice(property.price)}
-                      </div>
-                      
-                      {/* Percentage */}
-                      {percentage && (
-                        <div
-                          className={`flex items-center gap-0.5 text-[10px] sm:text-xs md:text-xs font-semibold whitespace-nowrap flex-shrink-0 ${
-                            isIncrease ? "text-green-400" : "text-red-400"
-                          }`}
-                        >
-                          {isIncrease ? (
-                            <ArrowUpIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
-                          ) : (
-                            <ArrowDownIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
-                          )}
-                          <span>{percentage}</span>
-                        </div>
-                      )}
-                    </div>
+                  )}
+                  
+                  {/* Builder Name */}
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium block md:whitespace-nowrap overflow-hidden text-ellipsis">
+                      {builder.name}
+                    </span>
+                  </div>
+                  
+                  {/* Star Rating */}
+                  <div className="flex-shrink-0">
+                    {renderStars(builder.rating)}
                   </div>
                 </div>
-              );
-            })}
+              </Link>
+            ))}
           </div>
         )}
       </div>

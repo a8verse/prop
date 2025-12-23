@@ -60,24 +60,32 @@ export default async function HomePage() {
     // Database might not be connected, continue with empty array
   }
 
-  // Fetch featured properties (with error handling)
-  let featuredProperties: any[] = [];
+  // Fetch builders with ratings (with error handling)
+  let builders: any[] = [];
   try {
-    featuredProperties = await prisma.property.findMany({
-      where: { isFeatured: true, isHidden: false },
-      take: 8,
-      include: {
-        builder: true,
-        location: true,
-        priceHistory: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
+    // Fetch all builders and sort manually to handle null ratings
+    const allBuilders = await prisma.builder.findMany({
+      where: { isSuspended: false },
+      select: {
+        id: true,
+        name: true,
+        logo: true,
+        rating: true,
       },
-      orderBy: { updatedAt: "desc" },
     });
+    
+    // Sort by rating (highest first), then by name, with nulls last
+    builders = allBuilders
+      .sort((a, b) => {
+        if (a.rating === null && b.rating === null) return a.name.localeCompare(b.name);
+        if (a.rating === null) return 1;
+        if (b.rating === null) return -1;
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 10);
   } catch (error) {
-    console.error("Error fetching featured properties:", error);
+    console.error("Error fetching builders:", error);
     // Continue with empty array
   }
 
@@ -93,10 +101,11 @@ export default async function HomePage() {
     // Continue with empty array
   }
 
-  // Get site settings for contact info (with error handling)
+  // Get site settings for contact info and background image (with error handling)
   let email: string | undefined;
   let phone: string | undefined;
   let socialLinks: Array<{ name: string; url: string }> = [];
+  let homeBackgroundImage: string | undefined;
 
   try {
     const emailSetting = await prisma.siteSettings.findUnique({
@@ -108,10 +117,19 @@ export default async function HomePage() {
     const socialLinksSetting = await prisma.siteSettings.findUnique({
       where: { key: "social_links" },
     });
+    const backgroundImageSetting = await prisma.siteSettings.findUnique({
+      where: { key: "home_background_image" },
+    });
 
     email = emailSetting?.value as string | undefined;
     phone = phoneSetting?.value as string | undefined;
     socialLinks = (socialLinksSetting?.value as Array<{ name: string; url: string }>) || [];
+    
+    if (backgroundImageSetting?.value) {
+      homeBackgroundImage = typeof backgroundImageSetting.value === 'string' 
+        ? backgroundImageSetting.value 
+        : (backgroundImageSetting.value as any)?.imageUrl || undefined;
+    }
   } catch (error) {
     console.error("Error fetching site settings:", error);
     // Use defaults
@@ -122,7 +140,7 @@ export default async function HomePage() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/background.jpg"
+          src={homeBackgroundImage || "/images/background.jpg"}
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -143,7 +161,7 @@ export default async function HomePage() {
         <Suspense fallback={<div className="flex-1 flex items-center justify-center" style={{ paddingTop: '100px' }}><div className="text-white/60">Loading...</div></div>}>
           <HomeContent
             categories={categories}
-            featuredProperties={featuredProperties}
+            builders={builders}
           />
         </Suspense>
 
