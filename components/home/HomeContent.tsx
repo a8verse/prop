@@ -14,7 +14,7 @@ interface HomeContentProps {
 
 export default function HomeContent({
   categories,
-  builders,
+  builders: featuredBuilders,
   initialShowListings = false,
 }: HomeContentProps) {
   const searchParams = useSearchParams();
@@ -161,7 +161,7 @@ export default function HomeContent({
 
         {/* Featured Builders - Right (1/5 on desktop, reduced width) */}
         <div className="lg:col-span-1 flex items-center h-full min-h-0 bg-white/10 rounded max-w-xs">
-          <FeaturedProperties builders={builders} />
+          <FeaturedProperties builders={featuredBuilders} />
         </div>
       </div>
     </div>

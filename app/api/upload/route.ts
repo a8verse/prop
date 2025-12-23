@@ -4,7 +4,15 @@ import { authOptions } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import sharp from "sharp";
+
+// Import sharp with error handling
+let sharp: any;
+try {
+  sharp = require("sharp");
+} catch (e) {
+  // Sharp not installed - will skip optimization
+  sharp = null;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,9 +58,9 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Optimize image if it's an image file
+    // Optimize image if it's an image file and sharp is available
     let finalBuffer = buffer;
-    if (file.type.startsWith("image/")) {
+    if (file.type.startsWith("image/") && sharp) {
       try {
         const image = sharp(buffer);
         const metadata = await image.metadata();
