@@ -64,7 +64,7 @@ export default function ProfilePage() {
       }
 
       const uploadData = await uploadRes.json();
-      setFormData({ ...formData, image: uploadData.path });
+      setFormData({ ...formData, image: uploadData.url || uploadData.path });
     } catch (error) {
       console.error("Upload error:", error);
       alert("Error uploading image");

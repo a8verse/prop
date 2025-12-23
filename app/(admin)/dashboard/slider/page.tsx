@@ -88,7 +88,7 @@ export default function SliderManagementPage() {
       }
 
       const uploadData = await uploadRes.json();
-      setFormData({ ...formData, imageUrl: uploadData.path });
+      setFormData({ ...formData, imageUrl: uploadData.url || uploadData.path });
       setUploading(false);
     } catch (error) {
       console.error("Upload error:", error);
