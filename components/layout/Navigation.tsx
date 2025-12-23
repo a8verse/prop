@@ -20,6 +20,17 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
   const { data: session } = useSession();
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const [navTop, setNavTop] = useState('60px');
+
+  // Update nav top position based on screen size
+  useEffect(() => {
+    const updateNavTop = () => {
+      setNavTop(window.innerWidth < 768 ? '80px' : '60px');
+    };
+    updateNavTop();
+    window.addEventListener('resize', updateNavTop);
+    return () => window.removeEventListener('resize', updateNavTop);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
