@@ -114,16 +114,23 @@ export default function Navigation({ categories = [], socialLinks = [] }: Naviga
           {/* Desktop/Tablet Layout */}
           <div className="hidden md:flex items-center justify-between flex-wrap gap-2">
             {/* Categories - Left */}
-            <div className="flex items-center space-x-4 md:space-x-6 flex-wrap">
+            <div className="flex items-center space-x-2 md:space-x-3 flex-wrap">
               {categories.length > 0 ? (
-                categories.map((category) => (
-                  <Link
-                    key={category.id}
-                    href={`/?category=${category.slug}`}
-                    className="text-white hover:text-primary transition-colors text-sm font-medium border-b-2 border-transparent hover:border-primary"
-                  >
-                    {category.name}
-                  </Link>
+                categories.map((category, index) => (
+                  <div key={category.id} className="flex items-center">
+                    <Link
+                      href={`/?category=${category.slug}`}
+                      className="relative text-white hover:text-primary transition-colors text-sm font-medium px-2 py-1 group overflow-hidden"
+                    >
+                      {/* Left-to-right line animation on hover */}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-400 group-hover:w-full transition-all duration-300 ease-out"></span>
+                      {category.name}
+                    </Link>
+                    {/* Golden separator - don't show after last category */}
+                    {index < categories.length - 1 && (
+                      <span className="text-yellow-400 text-lg font-bold mx-1">|</span>
+                    )}
+                  </div>
                 ))
               ) : (
                 <div className="text-white/40 text-sm">No categories yet</div>
