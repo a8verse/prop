@@ -156,23 +156,40 @@ export default function HomeContent({
     ? Math.max(...featuredBuilders.map(b => b.name.length))
     : 0;
   
-  // Calculate column width based on longest builder name (min 200px, max 350px)
+  // Calculate column width based on longest builder name (min 200px, max 400px)
+  // Formula: base width + (name length * character width) + padding
   const columnWidth = maxBuilderNameLength > 0
-    ? Math.min(Math.max(maxBuilderNameLength * 8 + 80, 200), 350)
+    ? Math.min(Math.max(maxBuilderNameLength * 7 + 100, 200), 400)
     : 250;
+
+  const [windowWidth, setWindowWidth] = useState(getWindowWidth());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   return (
     <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4" style={{ paddingTop: '100px' }}>
-      <div className="max-w-7xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 md:gap-6 lg:gap-8">
+      <div className="max-w-7xl mx-auto w-full h-full flex flex-col lg:flex-row gap-3 md:gap-6 lg:gap-8">
         {/* Hero Section - Left (flexible width) */}
-        <div className="flex items-center h-full min-h-0">
+        <div className="flex-1 flex items-center h-full min-h-0">
           <HeroSection />
         </div>
 
         {/* Featured Builders - Right (auto width based on content) */}
         <div 
-          className="flex items-center h-full min-h-0"
-          style={{ width: `${columnWidth}px`, maxWidth: '100%' }}
+          className="flex items-center h-full min-h-0 flex-shrink-0"
+          style={{ 
+            width: windowWidth >= 1024 ? `${columnWidth}px` : '100%',
+            maxWidth: '100%' 
+          }}
         >
           <FeaturedProperties builders={featuredBuilders} />
         </div>
