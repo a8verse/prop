@@ -151,16 +151,29 @@ export default function HomeContent({
     );
   }
 
+  // Calculate max width needed for builder names
+  const maxBuilderNameLength = featuredBuilders.length > 0 
+    ? Math.max(...featuredBuilders.map(b => b.name.length))
+    : 0;
+  
+  // Calculate column width based on longest builder name (min 200px, max 350px)
+  const columnWidth = maxBuilderNameLength > 0
+    ? Math.min(Math.max(maxBuilderNameLength * 8 + 80, 200), 350)
+    : 250;
+
   return (
     <div className="flex-1 flex items-center justify-center overflow-hidden px-2 md:px-4 lg:px-8 py-2 md:py-4" style={{ paddingTop: '100px' }}>
-      <div className="max-w-7xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-5 gap-3 md:gap-6 lg:gap-8">
-        {/* Hero Section - Left (4/5 on desktop) */}
-        <div className="lg:col-span-4 flex items-center h-full min-h-0">
+      <div className="max-w-7xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 md:gap-6 lg:gap-8">
+        {/* Hero Section - Left (flexible width) */}
+        <div className="flex items-center h-full min-h-0">
           <HeroSection />
         </div>
 
-        {/* Featured Builders - Right (1/5 on desktop, adjustable width) */}
-        <div className="lg:col-span-1 flex items-center h-full min-h-0">
+        {/* Featured Builders - Right (auto width based on content) */}
+        <div 
+          className="flex items-center h-full min-h-0"
+          style={{ width: `${columnWidth}px`, maxWidth: '100%' }}
+        >
           <FeaturedProperties builders={featuredBuilders} />
         </div>
       </div>

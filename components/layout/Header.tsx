@@ -11,14 +11,19 @@ interface HeaderProps {
   email?: string;
   phone?: string;
   logo?: string;
+  logoBgColor?: string;
+  logoBgTransparent?: boolean;
 }
 
-export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
+export default function Header({ email, phone, logo: logoProp, logoBgColor: logoBgColorProp, logoBgTransparent: logoBgTransparentProp }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [logo, setLogo] = useState<string | undefined>(logoProp);
   const router = useRouter();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const [logoBgColor, setLogoBgColor] = useState<string>(logoBgColorProp || "#eae5d7");
+  const [logoBgTransparent, setLogoBgTransparent] = useState<boolean>(logoBgTransparentProp || false);
 
   // Fetch logo from database if not provided via props
   useEffect(() => {
@@ -27,19 +32,26 @@ export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
         .then((res) => res.json())
         .then((data) => {
           if (data?.value) {
-            const logoValue = typeof data.value === 'string' 
-              ? data.value 
-              : (data.value as any)?.logo;
-            if (logoValue) {
+            const logoValue = data.value;
+            if (typeof logoValue === 'string') {
               setLogo(logoValue);
+            } else if (typeof logoValue === 'object' && logoValue !== null) {
+              const logoObj = logoValue as any;
+              setLogo(logoObj.logo);
+              setLogoBgColor(logoObj.logoBgColor || "#eae5d7");
+              setLogoBgTransparent(logoObj.logoBgTransparent || false);
             }
           }
         })
         .catch((error) => {
           console.error("Error fetching logo:", error);
         });
+    } else {
+      // If logo is provided via props, also set background color and transparent
+      setLogoBgColor(logoBgColorProp || "#eae5d7");
+      setLogoBgTransparent(logoBgTransparentProp || false);
     }
-  }, [logoProp]);
+  }, [logoProp, logoBgColorProp, logoBgTransparentProp]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {
@@ -61,7 +73,12 @@ export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center">
                 {hasLogo ? (
-                  <div className="relative h-8 w-24 bg-[#eae5d7] rounded px-2 flex items-center justify-center">
+                  <div 
+                    className="relative h-8 w-24 rounded px-2 flex items-center justify-center"
+                    style={{
+                      backgroundColor: logoBgTransparent ? 'transparent' : logoBgColor,
+                    }}
+                  >
                     {logoPath.startsWith('data:') ? (
                       <img
                         src={logoPath}
@@ -109,7 +126,12 @@ export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
               {hasLogo ? (
-                <div className="relative h-10 w-32 bg-[#eae5d7] rounded px-2 flex items-center justify-center">
+                <div 
+                  className="relative h-10 w-32 rounded px-2 flex items-center justify-center"
+                  style={{
+                    backgroundColor: logoBgTransparent ? 'transparent' : logoBgColor,
+                  }}
+                >
                   {logoPath.startsWith('data:') ? (
                     <img
                       src={logoPath}
@@ -144,19 +166,12 @@ export default function Header({ email, phone, logo: logoProp }: HeaderProps) {
                   stroke="currentColor" 
                   strokeWidth={2} 
                   viewBox="0 0 24 24"
-                  style={{ 
-                    filter: 'none',
-                    WebkitFilter: 'none',
-                    backdropFilter: 'none',
-                    WebkitBackdropFilter: 'none',
-                    isolation: 'isolate'
-                  }}
+                  shapeRendering="geometricPrecision"
                 >
                   <path 
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-                    style={{ filter: 'none' }}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
               </div>

@@ -324,18 +324,25 @@ function GeneralSettings() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: "contact_phone", value: formData.contactPhone }),
         }),
-        fetch("/api/site-settings", {
+        // Save logo - always store as object to preserve background color and transparent settings
+        const logoValue = formData.logo.startsWith('data:') 
+          ? {
+              logo: formData.logo,
+              logoBgColor: formData.logoBgColor,
+              logoBgTransparent: formData.logoBgTransparent,
+            }
+          : {
+              logo: formData.logo,
+              logoBgColor: formData.logoBgColor,
+              logoBgTransparent: formData.logoBgTransparent,
+            };
+        
+        await fetch("/api/site-settings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             key: "logo",
-            value: formData.logo.startsWith('data:') 
-              ? formData.logo 
-              : {
-                  logo: formData.logo,
-                  logoBgColor: formData.logoBgColor,
-                  logoBgTransparent: formData.logoBgTransparent,
-                },
+            value: logoValue,
           }),
         }),
         fetch("/api/site-settings", {

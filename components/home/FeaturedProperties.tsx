@@ -49,7 +49,7 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
   };
 
   return (
-    <div className="bg-[#f5f5f0] p-2 md:p-3 lg:p-4 h-full max-h-[300px] sm:max-h-[400px] md:max-h-[500px] flex flex-col w-full mt-20 sm:mt-24 md:mt-28 mb-4 sm:mb-6 md:mb-8 shadow-lg rounded-none">
+    <div className="bg-[#f5f5f0] p-2 md:p-3 lg:p-4 h-full max-h-[300px] sm:max-h-[400px] md:max-h-[500px] flex flex-col w-full mt-20 sm:mt-24 md:mt-28 mb-6 sm:mb-8 md:mb-10 shadow-lg rounded-none">
       {/* Mobile: Horizontal Scroll, Desktop: Vertical Scroll */}
       <div className="flex-1 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden space-y-1 md:space-y-1.5 pr-1 md:pr-1">
         {builders.length === 0 ? (
@@ -77,20 +77,19 @@ export default function FeaturedProperties({ builders }: FeaturedPropertiesProps
                     </div>
                   )}
                   
-                  {/* Builder Name - Single row, font size adjusts to fit */}
-                  <div className="flex-1 min-w-0 overflow-hidden">
+                  {/* Builder Name - Single row, full name visible */}
+                  <div className="flex-1 min-w-0">
                     <span 
-                      className="font-medium block whitespace-nowrap overflow-hidden text-ellipsis"
+                      className="font-medium block whitespace-nowrap"
                       style={{
-                        fontSize: builder.name.length > 20 
+                        fontSize: builder.name.length > 25 
                           ? '0.65rem' 
-                          : builder.name.length > 15 
+                          : builder.name.length > 20 
                             ? '0.7rem' 
-                            : builder.name.length > 10
+                            : builder.name.length > 15
                               ? '0.75rem'
                               : '0.8rem'
                       }}
-                      title={builder.name}
                     >
                       {builder.name}
                     </span>

@@ -107,6 +107,8 @@ export default async function HomePage() {
   let socialLinks: Array<{ name: string; url: string }> = [];
   let homeBackgroundImage: string | undefined;
   let logo: string | undefined;
+  let logoBgColor: string = "#eae5d7";
+  let logoBgTransparent: boolean = false;
 
   try {
     const emailSetting = await prisma.siteSettings.findUnique({
@@ -140,7 +142,10 @@ export default async function HomePage() {
       if (typeof logoValue === 'string') {
         logo = logoValue;
       } else if (typeof logoValue === 'object' && logoValue !== null) {
-        logo = (logoValue as any).logo || undefined;
+        const logoObj = logoValue as any;
+        logo = logoObj.logo || undefined;
+        logoBgColor = logoObj.logoBgColor || "#eae5d7";
+        logoBgTransparent = logoObj.logoBgTransparent || false;
       }
     }
   } catch (error) {
@@ -165,7 +170,13 @@ export default async function HomePage() {
       {/* Content - Flexbox layout to fit screen */}
       <div className="relative z-10 h-full flex flex-col">
         {/* Header - Logo (Left), Search (Center), Email/Phone (Right) - Fully Transparent */}
-        <Header email={email || "hello@oliofly.com"} phone={phone || "+919999999999"} logo={logo} />
+        <Header 
+          email={email || "hello@oliofly.com"} 
+          phone={phone || "+919999999999"} 
+          logo={logo}
+          logoBgColor={logoBgColor}
+          logoBgTransparent={logoBgTransparent}
+        />
         
         {/* Menu Bar - Categories (Left), Social Icons + Burger Menu (Right) - Blurred Background */}
         <Navigation categories={categories} socialLinks={socialLinks} />
