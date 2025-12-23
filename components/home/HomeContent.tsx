@@ -6,6 +6,14 @@ import HeroSection from "./HeroSection";
 import FeaturedProperties from "./FeaturedProperties";
 import PropertyList from "@/components/property/PropertyList";
 
+// Helper to get window width safely
+const getWindowWidth = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth;
+  }
+  return 1024; // Default to desktop width for SSR
+};
+
 interface HomeContentProps {
   categories: Array<{ id: string; name: string; slug: string }>;
   builders: Array<{ id: string; name: string; logo: string | null; rating: number | null }>;
