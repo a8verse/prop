@@ -1,0 +1,287 @@
+HOSTINGER DATABASE → VERCEL ENVIRONMENT VARIABLES
+=================================================
+
+VISUAL STEP-BY-STEP GUIDE
+
+
+═══════════════════════════════════════════════════════════════════
+PART 1: GET CONNECTION STRING FROM HOSTINGER
+═══════════════════════════════════════════════════════════════════
+
+STEP 1A: Login to Hostinger
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL: https://hpanel.hostinger.com
+     ↓
+     Enter email/password
+     ↓
+     Click Login
+
+
+STEP 1B: Find Databases
+━━━━━━━━━━━━━━━━━━━━━
+
+Once logged in, you'll see dashboard:
+
+Left Sidebar Menu:
+┌─────────────────────────┐
+│ Account                 │
+│ Hosting                 │
+│ Databases ←── CLICK HERE│
+│ Emails                  │
+│ Domains                 │
+│ Settings                │
+└─────────────────────────┘
+
+
+STEP 1C: Find Your Database
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+After clicking Databases:
+
+You'll see a list of databases:
+┌────────────────────────────────────┐
+│ property_portal                    │
+│ Status: Online                     │
+│ [Manage] [Backup] [Delete]         │
+└────────────────────────────────────┘
+
+Click "Manage" button
+
+
+STEP 1D: Get Connection Details
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You'll see database information:
+
+Database Name:        property_portal
+Username:            user_12345
+Password:            MySecurePass123  (masked, click to reveal)
+Host:                db-mysql-1.hostinger.com
+Port:                3306
+Charset:             utf8mb4
+
+📝 COPY THESE VALUES
+
+
+STEP 1E: Build Your Connection String
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Format:
+mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE
+
+Your Example:
+mysql://user_12345:MySecurePass123@db-mysql-1.hostinger.com:3306/property_portal
+
+⚠️ Keep this secure! Don't share it!
+
+
+═══════════════════════════════════════════════════════════════════
+PART 2: ADD TO VERCEL
+═══════════════════════════════════════════════════════════════════
+
+STEP 2A: Open Vercel Dashboard
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL: https://vercel.com/dashboard
+     ↓
+     You should see your projects
+
+
+STEP 2B: Select Your Project
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Projects list:
+┌──────────────────────────────────┐
+│ [prop]                           │
+│ prop-staging                     │
+│ other-projects                   │
+└──────────────────────────────────┘
+
+Click on "prop" project
+
+
+STEP 2C: Go to Settings
+━━━━━━━━━━━━━━━━━━━━━
+
+Top navigation bar:
+
+[Overview] [Deployments] [Settings] ←── CLICK
+                                        
+Or use left sidebar if available
+
+
+STEP 2D: Find Environment Variables
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Left sidebar:
+┌──────────────────────────────┐
+│ General                      │
+│ Environment Variables ←─ HERE│
+│ Domains                      │
+│ Git                          │
+│ Functions                    │
+└──────────────────────────────┘
+
+Click "Environment Variables"
+
+
+STEP 2E: Add DATABASE_URL
+━━━━━━━━━━━━━━━━━━━━━━━
+
+Current environment variables section:
+
+[Add] button ←── CLICK
+
+
+STEP 2F: Fill in the Form
+━━━━━━━━━━━━━━━━━━━━━━
+
+A form will appear:
+
+Name:
+┌────────────────────────┐
+│ DATABASE_URL           │
+└────────────────────────┘
+
+Value:
+┌────────────────────────────────────────────────────┐
+│ mysql://user_12345:MySecurePass123@db-mysql-1...  │
+└────────────────────────────────────────────────────┘
+(Paste your connection string from Step 1E)
+
+Environments:
+☑ Production
+☑ Preview  
+☑ Development
+(Choose one or all)
+
+[Add] button ←── CLICK
+
+
+STEP 2G: Verify It's Added
+━━━━━━━━━━━━━━━━━━━━━━━
+
+After clicking Add, you should see:
+
+Environment Variables list:
+┌──────────────────────────────────────┐
+│ DATABASE_URL                         │
+│ Value: mysql://user_12345:...  ✅   │
+│ [Edit] [Delete]                      │
+└──────────────────────────────────────┘
+
+✅ Success! Variable is added
+
+
+═══════════════════════════════════════════════════════════════════
+PART 3: VERIFY IT WORKS
+═══════════════════════════════════════════════════════════════════
+
+STEP 3A: Test Locally
+━━━━━━━━━━━━━━━━━━━
+
+1. Create .env file:
+   $ nano /Users/eaklovyachawla/prop/.env
+
+2. Add:
+   DATABASE_URL="mysql://user_12345:MySecurePass123@db-mysql-1.hostinger.com:3306/property_portal"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret-key"
+
+3. Start dev server:
+   $ npm run dev
+
+4. Expected output:
+   ✅ "Ready on http://localhost:3000"
+   ✅ No database errors
+
+5. Open browser:
+   http://localhost:3000
+   
+   Should show: Homepage with builders, categories ✅
+
+
+STEP 3B: Trigger Vercel Redeploy
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Option 1: Push to git (auto-redeploy)
+   $ git add .
+   $ git commit -m "Add Hostinger database"
+   $ git push origin main
+
+Option 2: Manual redeploy in Vercel
+   - Go to Vercel dashboard
+   - Click "Deployments"
+   - Find latest deployment
+   - Click "Redeploy"
+
+
+STEP 3C: Wait for Deployment
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Vercel shows deployment status:
+Building → Deploying → Ready ✅
+
+This takes 2-5 minutes
+
+
+STEP 3D: Test Production
+━━━━━━━━━━━━━━━━━━━━━━
+
+Open: https://www.oliofly.com
+
+Should show: Homepage with data ✅
+
+Check API:
+$ curl https://www.oliofly.com/api/builders
+
+Should return: 200 status code with data ✅
+
+
+STEP 3E: Check Vercel Logs
+━━━━━━━━━━━━━━━━━━━━━━
+
+$ vercel logs --follow
+
+Look for:
+✅ No "Server has closed the connection" 
+✅ No "P1017" errors
+✅ Database queries successful
+
+
+═══════════════════════════════════════════════════════════════════
+ALL DONE! ✅
+═══════════════════════════════════════════════════════════════════
+
+Your Hostinger database is now connected to Vercel!
+
+Summary:
+1. ✅ Got connection string from Hostinger
+2. ✅ Added to Vercel environment variables
+3. ✅ Updated local .env
+4. ✅ Tested locally (npm run dev)
+5. ✅ Redeployed to Vercel
+6. ✅ Verified production (oliofly.com)
+
+
+═══════════════════════════════════════════════════════════════════
+
+If anything fails, check these:
+
+❌ Local (npm run dev) fails:
+   → Database offline?
+   → Wrong connection string?
+   → Hostinger firewall issue?
+
+❌ Production fails:
+   → Wait 5 minutes for deployment
+   → Force redeploy: vercel deploy --prod
+   → Check: vercel logs --follow
+
+❌ Can't find Databases in Hostinger:
+   → Make sure you're in hPanel
+   → Check left sidebar
+   → You might be in wrong account
+
+═════════════════════════════════════════════════════════════════════

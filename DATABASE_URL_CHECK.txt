@@ -1,0 +1,200 @@
+DATABASE_URL STATUS CHECK GUIDE
+================================
+
+There are 3 places where DATABASE_URL can be stored:
+
+1. LOCAL ENVIRONMENT (.env file)
+2. VERCEL ENVIRONMENT VARIABLES  
+3. GIT HISTORY / BACKED UP
+
+
+METHOD 1: CHECK LOCAL .env FILE
+================================
+
+Option A - From Terminal:
+$ cd /Users/eaklovyachawla/prop
+$ cat .env
+
+If .env doesn't exist:
+$ ls -la | grep env
+
+If you see .env.local or .env.backup, check those:
+$ cat .env.local
+$ cat .env.backup
+
+
+METHOD 2: CHECK VERCEL ENVIRONMENT VARIABLES
+=============================================
+
+Option A - Vercel Web Dashboard (Easiest):
+1. Go to: https://vercel.com/dashboard
+2. Click on your project "prop"
+3. Navigate to: Settings → Environment Variables
+4. Look for "DATABASE_URL" in the list
+5. You can see the value (partially masked for security)
+
+Option B - Vercel CLI (if installed):
+$ vercel env list
+$ vercel env list DATABASE_URL
+
+Option C - Check Vercel Project Settings File:
+$ cd /Users/eaklovyachawla/prop
+$ cat .vercel/project.json (if exists)
+
+
+METHOD 3: CHECK GIT HISTORY
+===========================
+
+Check if DATABASE_URL was ever committed:
+$ cd /Users/eaklovyachawla/prop
+$ git log --all -p --follow -- .env | head -100
+
+Show all commits with file changes:
+$ git log --all --name-status | grep -E ".env|DATABASE"
+
+
+METHOD 4: CHECK CURRENT SHELL ENVIRONMENT
+==========================================
+
+See if DATABASE_URL is currently in your shell:
+$ echo $DATABASE_URL
+
+If empty, it's not set. If you see a value:
+$ echo $DATABASE_URL | head -c 50
+
+(Shows first 50 characters for security)
+
+
+METHOD 5: FIND WHERE DATABASE_URL IS USED IN CODE
+==================================================
+
+Search code files for DATABASE_URL:
+$ grep -r "DATABASE_URL" /Users/eaklovyachawla/prop --include="*.ts" --include="*.js" --include="*.json"
+
+This will show:
+- prisma/schema.prisma (expects env variable)
+- lib/prisma.ts (uses the variable)
+- Any other code referencing it
+
+
+QUICK STATUS CHECK SCRIPT
+=========================
+
+Run this combined check:
+
+#!/bin/bash
+
+echo "=== DATABASE_URL STATUS CHECK ==="
+echo ""
+
+# Check 1: Local .env file
+echo "1. Checking local .env file:"
+if [ -f "/Users/eaklovyachawla/prop/.env" ]; then
+    echo "   ✅ .env file EXISTS"
+    echo "   DATABASE_URL line:"
+    grep "DATABASE_URL" /Users/eaklovyachawla/prop/.env | head -c 80
+    echo "..."
+else
+    echo "   ❌ .env file NOT FOUND"
+fi
+
+echo ""
+
+# Check 2: Current environment variable
+echo "2. Checking current environment:"
+if [ -z "$DATABASE_URL" ]; then
+    echo "   ❌ DATABASE_URL NOT SET in current shell"
+else
+    echo "   ✅ DATABASE_URL IS SET"
+    echo "   Value (first 60 chars): ${DATABASE_URL:0:60}..."
+fi
+
+echo ""
+
+# Check 3: Vercel project file
+echo "3. Checking Vercel project config:"
+if [ -f "/Users/eaklovyachawla/prop/.vercel/project.json" ]; then
+    echo "   ✅ .vercel/project.json EXISTS"
+    cat /Users/eaklovyachawla/prop/.vercel/project.json | jq . 2>/dev/null || echo "   (Could not parse JSON)"
+else
+    echo "   ❌ .vercel/project.json NOT FOUND"
+fi
+
+echo ""
+
+# Check 4: .env.example
+echo "4. Checking .env.example:"
+if [ -f "/Users/eaklovyachawla/prop/.env.example" ]; then
+    echo "   ✅ .env.example EXISTS (reference template)"
+    grep "DATABASE_URL" /Users/eaklovyachawla/prop/.env.example | head -2
+else
+    echo "   ❌ .env.example NOT FOUND"
+fi
+
+
+WHAT IT MEANS
+=============
+
+If LOCAL .env EXISTS:
+  ✅ Good for local development
+  ⚠️  Won't affect Vercel (needs separate config there)
+
+If VERCEL env var EXISTS:
+  ✅ Good for production
+  ❌ If not set, Vercel deployment will fail
+
+If ENVIRONMENT VARIABLE SET:
+  ✅ Can test locally with it
+  ❌ If not set, `npm run dev` might fail
+
+If IN GIT HISTORY:
+  ✅ You had it before
+  ❌ Check if accidentally committed (security risk!)
+  ⚠️  Might have been removed in .gitignore
+
+
+RECOVERING DATABASE_URL
+=======================
+
+If you lost it, options:
+
+1. Check .env.backup (if exists)
+   $ cat .env.backup
+
+2. Check git stash (if temporarily saved)
+   $ git stash list
+   $ git stash show -p
+
+3. Check local system backups
+   $ find ~ -name ".env*" -mtime -30
+
+4. Contact your database provider:
+   - Database provider account → View connection string
+   - They can regenerate or show existing connection
+
+5. Check Vercel Production logs:
+   - Your deployed version likely has it working
+   - Check Vercel logs to see connection string being used (partially)
+
+
+RECOMMENDED ACTIONS
+===================
+
+1. Create/Update LOCAL .env:
+   $ cp .env.example .env
+   $ # Edit .env with your actual DATABASE_URL
+
+2. Set VERCEL environment variable:
+   - Go to Vercel Dashboard
+   - Add DATABASE_URL to Environment Variables
+   - Redeploy
+
+3. Test LOCAL connection:
+   $ npm run dev
+   $ curl http://localhost:3000
+
+4. Verify VERCEL connection:
+   $ vercel logs --follow
+   $ curl https://www.oliofly.com/api/builders
+
+

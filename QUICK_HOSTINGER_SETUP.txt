@@ -1,0 +1,118 @@
+HOSTINGER → VERCEL: QUICK START
+===============================
+
+⏱️ 5 MINUTE SETUP
+
+
+STEP 1: GET CONNECTION STRING FROM HOSTINGER (2 min)
+===================================================
+
+1. Open: https://hpanel.hostinger.com
+2. Click: Databases (left menu)
+3. Find: Your database → Click "Manage"
+4. Look for:
+   - Database name
+   - Username  
+   - Password
+   - Host (e.g., db123.hostinger.com)
+   - Port (usually 3306)
+
+5. Build connection string:
+   
+   Copy this format:
+   mysql://username:password@host:3306/database_name
+
+   Example (CHANGE THESE):
+   mysql://prop_user:MyPassword123@db456.hostinger.com:3306/property_portal
+
+
+STEP 2: ADD TO VERCEL (2 min)
+============================
+
+1. Open: https://vercel.com/dashboard
+2. Click: Your "prop" project
+3. Click: Settings (top)
+4. Click: Environment Variables (left sidebar)
+5. Click: Add button
+6. Fill in:
+   Name:  DATABASE_URL
+   Value: [Paste connection string from Step 1]
+   Target: Production (or All)
+7. Click: Add
+8. You should see it in the list ✅
+
+
+STEP 3: TEST LOCALLY (1 min)
+===========================
+
+1. Create/Update .env file:
+   $ nano /Users/eaklovyachawla/prop/.env
+
+2. Add this:
+   DATABASE_URL="mysql://username:password@host:3306/database"
+   (Use same value as Vercel)
+
+3. Test:
+   $ npm run dev
+
+4. Open browser:
+   http://localhost:3000
+
+Should load without database errors!
+
+
+DONE! ✅
+========
+
+Your Hostinger database is now connected to Vercel!
+
+Verify:
+✅ http://localhost:3000 loads
+✅ https://www.oliofly.com loads
+✅ No P1017 errors
+
+
+═════════════════════════════════════════════════════════════════
+
+
+EXAMPLE: REAL CONNECTION STRING
+===============================
+
+From Hostinger Dashboard:
+  Database: property_portal
+  Username: user_2024
+  Password: SecurePass123
+  Host: db456.hostinger.com
+  Port: 3306
+
+Connection String (for Vercel):
+  mysql://user_2024:SecurePass123@db456.hostinger.com:3306/property_portal
+
+Copy exactly as shown above!
+
+
+TROUBLESHOOTING
+===============
+
+If localhost (npm run dev) fails:
+  1. Check username/password in .env
+  2. Check host address
+  3. Check database name
+  4. Verify Hostinger database is online
+  
+If Vercel (oliofly.com) fails:
+  1. Verify variable added to Vercel
+  2. Wait 2-3 minutes
+  3. Force redeploy: vercel deploy --prod
+  4. Check logs: vercel logs --follow
+
+
+═════════════════════════════════════════════════════════════════
+
+HELP LINKS:
+
+Hostinger:  https://hpanel.hostinger.com
+Vercel:     https://vercel.com/dashboard
+Support:    https://support.hostinger.com
+
+═════════════════════════════════════════════════════════════════
