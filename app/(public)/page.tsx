@@ -162,9 +162,6 @@ export default async function HomePage() {
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Fallback gradient if image doesn't exist */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-30" />
-        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Content - Flexbox layout to fit screen */}
