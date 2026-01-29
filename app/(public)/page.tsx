@@ -49,7 +49,6 @@ export default async function HomePage() {
   // Fetch categories for navigation (with error handling) - only show in menu
   let categories: Array<{ id: string; name: string; slug: string }> = [];
   try {
-    await prisma.$connect();
     const allCategories = await prisma.category.findMany({
       orderBy: { order: "asc" },
     });

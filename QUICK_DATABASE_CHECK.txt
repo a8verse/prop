@@ -1,0 +1,227 @@
+QUICK REFERENCE: DATABASE_URL LOCATIONS
+========================================
+
+3 PLACES TO CHECK
+=================
+
+┌──────────────────────────────────────────────────────────────┐
+│ PLACE #1: LOCAL DEVELOPMENT (.env file)                     │
+├──────────────────────────────────────────────────────────────┤
+│ Path: /Users/eaklovyachawla/prop/.env                       │
+│ Status in git: IGNORED (private, not in GitHub)             │
+│                                                               │
+│ Command to view:                                             │
+│ cat /Users/eaklovyachawla/prop/.env                         │
+│                                                               │
+│ What you'll see:                                             │
+│ DATABASE_URL="mysql://user:pass@host/dbname"               │
+│ NEXTAUTH_URL="http://localhost:3000"                        │
+│ ...other variables...                                        │
+│                                                               │
+│ Purpose: Used by 'npm run dev' locally                       │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ PLACE #2: PRODUCTION (Vercel Environment Variables)          │
+├──────────────────────────────────────────────────────────────┤
+│ URL: https://vercel.com/dashboard                           │
+│ Path in UI: Settings → Environment Variables                │
+│                                                               │
+│ Steps to view:                                               │
+│ 1. Open https://vercel.com/dashboard in browser             │
+│ 2. Click on your "prop" project                             │
+│ 3. Click "Settings" (top menu)                              │
+│ 4. Click "Environment Variables" (left sidebar)             │
+│ 5. Look for "DATABASE_URL" in the list                      │
+│ 6. Click to see value (partially masked)                    │
+│                                                               │
+│ What you'll see:                                             │
+│ Name: DATABASE_URL                                           │
+│ Value: mysql://user:ppass@host/db... (masked for security) │
+│                                                               │
+│ Purpose: Used by your deployed app (www.oliofly.com)        │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ PLACE #3: GIT BACKUP/HISTORY                                 │
+├──────────────────────────────────────────────────────────────┤
+│ Files: .env.backup, git history, stashed changes           │
+│                                                               │
+│ Commands to check:                                           │
+│ # Check if .env was ever committed                          │
+│ git log --all -p .env | head -50                            │
+│                                                               │
+│ # Check for backup files                                    │
+│ ls -la /Users/eaklovyachawla/prop/.env*                    │
+│                                                               │
+│ # Check git stash (if saved temporarily)                    │
+│ git stash list                                               │
+│                                                               │
+│ Purpose: Recovery if lost                                   │
+│                                                               │
+└──────────────────────────────────────────────────────────────┘
+
+
+WHICH ONE DO YOU NEED?
+=======================
+
+FOR LOCAL DEVELOPMENT (.env file):
+  ✅ Needed to run: npm run dev
+  ✅ Used by: Your local computer
+  ✅ Check: cat /Users/eaklovyachawla/prop/.env
+
+FOR PRODUCTION (Vercel variable):
+  ✅ Needed to run: www.oliofly.com (deployment)
+  ✅ Used by: Vercel servers
+  ✅ Check: https://vercel.com/dashboard → Settings
+
+BOTH are needed:
+  ✅ Local dev: So you can test before pushing
+  ✅ Production: So deployed app can connect
+
+
+INSTANT CHECK COMMANDS
+======================
+
+Run these from terminal to find DATABASE_URL:
+
+# 1. Check if .env file exists and contains DATABASE_URL
+if [ -f "/Users/eaklovyachawla/prop/.env" ]; then
+  echo "✅ .env file found!"
+  grep DATABASE_URL /Users/eaklovyachawla/prop/.env
+else
+  echo "❌ .env file NOT found"
+fi
+
+# 2. Check if DATABASE_URL is in current terminal
+echo $DATABASE_URL
+
+# 3. Check for backup files
+ls -la /Users/eaklovyachawla/prop/.env*
+
+# 4. Check git history
+cd /Users/eaklovyachawla/prop
+git log --all -p .env | grep -A 2 -B 2 DATABASE_URL | head -20
+
+# 5. Check Vercel (if CLI installed)
+vercel env list
+
+
+COMPLETE VERIFICATION STEPS
+===========================
+
+STEP 1: Terminal Check
+  $ echo "=== Checking DATABASE_URL ==="
+  $ [ -f /Users/eaklovyachawla/prop/.env ] && echo "✅ .env exists" || echo "❌ .env missing"
+  $ [ -z "$DATABASE_URL" ] && echo "❌ Not loaded in terminal" || echo "✅ Loaded in terminal"
+
+STEP 2: View Content
+  $ cat /Users/eaklovyachawla/prop/.env | grep DATABASE_URL
+
+STEP 3: Check Vercel
+  $ vercel env list
+  OR manually visit https://vercel.com/dashboard
+
+STEP 4: Test Connection
+  $ npm run dev
+  (Should connect to database successfully)
+
+STEP 5: Verify Production
+  $ curl https://www.oliofly.com/api/builders
+  (Should return 200, not 500 error)
+
+
+IF .env FILE IS MISSING
+=======================
+
+Option 1: Create from template
+  $ cp /Users/eaklovyachawla/prop/.env.example /Users/eaklovyachawla/prop/.env
+  $ # Edit .env and add your actual DATABASE_URL
+
+Option 2: Get from database provider
+  # Login to your database provider's console
+  # Copy your connection string
+  # Edit .env and paste it
+
+Option 3: Get from backup
+  $ cp /Users/eaklovyachawla/prop/.env.backup /Users/eaklovyachawla/prop/.env
+
+Option 4: Get from Vercel
+  $ vercel env pull        # Downloads Vercel env vars to .env.local
+  $ mv .env.local .env
+
+
+IF VERCEL VARIABLE IS MISSING
+==============================
+
+Steps to add it to Vercel:
+
+1. Get your DATABASE_URL:
+   $ cat /Users/eaklovyachawla/prop/.env | grep DATABASE_URL
+
+2. Copy the value (the part after the =)
+
+3. Go to Vercel:
+   https://vercel.com/dashboard → Your Project → Settings
+
+4. Click "Environment Variables"
+
+5. Click "Add"
+
+6. Fill in:
+   Name: DATABASE_URL
+   Value: [paste your value from step 1]
+
+7. Click "Add"
+
+8. Trigger redeploy:
+   $ git commit --allow-empty -m "trigger redeploy"
+   $ git push
+
+
+STATUS OVERVIEW
+===============
+
+After checking these 3 places, you'll know:
+
+✅ .env file exists?
+   YES → Have local development setup
+   NO → Need to create it
+
+✅ Vercel env var set?
+   YES → Production deployment works
+   NO → Production will fail
+
+✅ Both set?
+   YES → Everything works (local + production)
+   NO → Some parts broken
+
+✅ Lost both?
+   Recover from:
+   - Database provider account
+   - .env.backup file
+   - Git history
+   - Team member backup
+
+
+SECURITY REMINDER
+=================
+
+⚠️ NEVER commit .env to git
+✅ Always keep .env in .gitignore
+✅ Use .env.example as reference template
+✅ Each developer has their own .env
+✅ Each environment (local, staging, prod) has own vars
+
+
+═════════════════════════════════════════════════════════════════
+
+SUMMARY:
+- Local: /Users/eaklovyachawla/prop/.env
+- Vercel: https://vercel.com/dashboard → Settings → Env Vars
+- Backup: /Users/eaklovyachawla/prop/.env.* files
+- Check command: cat /Users/eaklovyachawla/prop/.env | grep DATABASE_URL
+
+═════════════════════════════════════════════════════════════════

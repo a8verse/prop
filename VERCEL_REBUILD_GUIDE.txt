@@ -1,0 +1,85 @@
+MANUAL VERCEL REBUILD GUIDE
+===========================
+
+If Vercel didn't auto-rebuild, do this:
+
+OPTION 1: Manual Rebuild from Vercel Dashboard (Easiest)
+========================================================
+
+1. Open: https://vercel.com/dashboard
+
+2. Click: "prop" project
+
+3. Go to: "Deployments" tab
+
+4. Find: Latest deployment (should say "Failed" with schema error)
+
+5. Click: The deployment to open details
+
+6. Look for: "Redeploy" or "Rebuild" button
+
+7. Click: "Redeploy" button
+
+8. Wait: 3-5 minutes for build to complete
+
+9. Check: Status should change to "Ready" ✅
+
+
+OPTION 2: Force Rebuild with Empty Commit
+===========================================
+
+1. Make an empty commit:
+   $ cd /Users/eaklovyachawla/prop
+   $ git commit --allow-empty -m "trigger rebuild"
+
+2. Push to GitHub:
+   $ git push origin main
+
+3. Vercel will detect and rebuild
+
+4. Check progress at: https://vercel.com/dashboard
+
+
+OPTION 3: Check Build Logs
+===========================
+
+1. Go to: https://vercel.com/dashboard
+
+2. Click: "prop" project
+
+3. Click: "Deployments" tab
+
+4. Click: Latest failed deployment
+
+5. Scroll down: Look for error details
+
+6. Read: What the error says
+
+Common errors:
+- "DATABASE_URL not set" → Add to Vercel env vars
+- "Build failed" → Check package.json
+- "Schema validation failed" → vercel.json syntax error
+
+
+WHAT TO LOOK FOR
+================
+
+After rebuild, you should see:
+✅ Status: "Ready" (green)
+✅ All checks: Passed
+✅ No errors in log
+
+If still failing:
+❌ Check vercel.json syntax (JSON validator)
+❌ Check DATABASE_URL in environment variables
+❌ Check .env file (shouldn't be in git)
+
+
+VERCEL.JSON FIX CONFIRMED
+=========================
+
+✅ vercel.json has been fixed
+✅ Pushed to GitHub: commit 13bcebb
+✅ Ready for Vercel to rebuild
+
+Just need Vercel to detect the change!

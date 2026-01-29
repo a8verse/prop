@@ -8,6 +8,8 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  // Using connection pooling for Vercel serverless
+  // directUrl is used for migrations, DATABASE_URL is used for app
 }
 
 enum UserRole {

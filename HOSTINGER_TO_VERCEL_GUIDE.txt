@@ -1,0 +1,375 @@
+ADDING HOSTINGER DATABASE TO VERCEL
+===================================
+
+STEP 1: GET CONNECTION STRING FROM HOSTINGER
+=============================================
+
+1. Log in to Hostinger Panel:
+   https://hpanel.hostinger.com
+
+2. Find Your Database:
+   Left Menu → Databases → MySQL Databases
+
+3. Click Your Database:
+   (Look for your database name, e.g., "property_portal")
+
+4. Get Connection Details:
+   Click "Manage" or "Configure"
+   
+   You should see:
+   - Database name: [your_db_name]
+   - Username: [your_username]
+   - Password: [your_password]
+   - Host: [your_host.com]
+   - Port: Usually 3306
+
+5. Build Your Connection String:
+   
+   Format:
+   mysql://username:password@host:3306/database_name
+
+   Example:
+   mysql://myuser:MyPass123@db.hostinger.com:3306/property_portal
+
+⚠️ IMPORTANT SECURITY NOTES:
+   - Never share this string publicly
+   - Keep password safe
+   - Use URL encoding for special characters
+   - If password has special chars, see "URL Encoding" section below
+
+
+SPECIAL CHARACTERS IN PASSWORD
+==============================
+
+If your password has special characters, URL encode them:
+
+Character  →  Encoded
+@          →  %40
+#          →  %23
+$          →  %24
+%          →  %25
+&          →  %26
+!          →  %21
+?          →  %3F
+
+Example:
+Password: Pass@123#456
+Encoded: Pass%40123%23456
+
+Connection String:
+mysql://user:Pass%40123%23456@host/database
+
+
+STEP 2: ADD TO VERCEL ENVIRONMENT VARIABLES
+============================================
+
+METHOD A: Using Vercel Web Dashboard (Easiest)
+-----------------------------------------------
+
+1. Open Vercel Dashboard:
+   https://vercel.com/dashboard
+
+2. Select Your Project:
+   Click "prop" project
+
+3. Go to Settings:
+   Click "Settings" in top navigation
+
+4. Find Environment Variables:
+   Left sidebar → "Environment Variables"
+
+5. Add DATABASE_URL:
+   a. Click "Add"
+   b. Name: DATABASE_URL
+   c. Value: [Your Hostinger connection string]
+   d. Environments: Select "Production" (or all)
+   e. Click "Add"
+
+6. Confirm It's Added:
+   You should see DATABASE_URL in the list
+
+7. Trigger Redeploy:
+   Go to "Deployments" → Click "Redeploy" on latest
+   OR push code change: git push origin main
+
+
+METHOD B: Using Vercel CLI
+---------------------------
+
+1. Install Vercel CLI (if not already):
+   npm install -g vercel
+
+2. Connect to Your Project:
+   cd /Users/eaklovyachawla/prop
+   vercel link
+
+3. Add Environment Variable:
+   vercel env add DATABASE_URL
+
+   It will ask:
+   "Enter your variable value:" 
+   [Paste your Hostinger connection string]
+
+   Choose environment: Production
+
+4. Verify It's Added:
+   vercel env list
+
+5. Pull to Local .env:
+   vercel env pull
+
+6. Redeploy:
+   git push origin main
+
+
+METHOD C: Using Vercel API
+--------------------------
+
+If you have Vercel token:
+
+curl -X POST "https://api.vercel.com/v9/projects/[PROJECT_ID]/env" \
+  -H "Authorization: Bearer [TOKEN]" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "key": "DATABASE_URL",
+    "value": "mysql://...",
+    "target": "production"
+  }'
+
+
+STEP 3: UPDATE LOCAL .env FOR TESTING
+======================================
+
+1. Create/Update Local .env:
+   cd /Users/eaklovyachawla/prop
+   nano .env
+
+2. Add Your Hostinger Connection:
+   DATABASE_URL="mysql://username:password@db.hostinger.com:3306/database_name"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret"
+   GOOGLE_CLIENT_ID=""
+   GOOGLE_CLIENT_SECRET=""
+   FACEBOOK_CLIENT_ID=""
+   FACEBOOK_CLIENT_SECRET=""
+   SMTP_HOST="smtp.gmail.com"
+   SMTP_PORT="587"
+   SMTP_USER=""
+   SMTP_PASSWORD=""
+   SMTP_FROM_EMAIL=""
+
+3. Save file (Ctrl+X, Y, Enter if using nano)
+
+4. Test locally:
+   npm run dev
+
+   Should see:
+   ✅ "Ready on http://localhost:3000"
+   ✅ No database connection errors
+
+
+STEP 4: VERIFY CONNECTION WORKS
+================================
+
+Test 1: Check Local Development
+----------------------------------
+$ npm run dev
+
+Open: http://localhost:3000
+
+You should see:
+✅ Homepage loads
+✅ Builders display
+✅ Categories display
+✅ No console errors about database
+
+
+Test 2: Check API Endpoints Locally
+------------------------------------
+$ curl http://localhost:3000/api/builders
+$ curl http://localhost:3000/api/locations
+$ curl "http://localhost:3000/api/site-settings?key=site_name"
+
+Should return:
+✅ 200 status code
+✅ JSON data (not 500 error)
+
+
+Test 3: Check Production (After Redeploy)
+------------------------------------------
+Wait for Vercel to finish deploying, then:
+
+$ curl https://www.oliofly.com/api/builders
+$ curl https://www.oliofly.com/api/locations
+$ curl "https://www.oliofly.com/api/site-settings?key=site_name"
+
+Should return:
+✅ 200 status code
+✅ JSON data (not 500 error)
+
+
+Test 4: Check Vercel Logs
+-------------------------
+$ vercel logs --follow
+
+Should show:
+✅ No "Server has closed the connection" errors
+✅ Database queries executing successfully
+
+
+COMMON ISSUES & SOLUTIONS
+=========================
+
+Issue 1: "Connection refused"
+-----------------------------
+Problem: Can't connect to Hostinger database
+Solution:
+  1. Verify connection string is correct
+  2. Check if Hostinger database is online
+  3. Verify firewall allows external connections
+  4. Check username/password are correct
+
+Fix:
+  - Test locally first: npm run dev
+  - If local works, issue is with Vercel's network access
+  - If local fails, issue is with connection string
+
+
+Issue 2: "Access denied for user"
+---------------------------------
+Problem: Wrong username or password
+Solution:
+  1. Go to Hostinger panel
+  2. Verify username in database settings
+  3. Reset password if forgotten
+  4. Update DATABASE_URL with correct credentials
+
+
+Issue 3: "Unknown host"
+----------------------
+Problem: Host address wrong
+Solution:
+  1. Copy host from Hostinger panel exactly
+  2. Should look like: db123456.hostinger.com
+  3. Not just "hostinger.com"
+
+
+Issue 4: "Database does not exist"
+----------------------------------
+Problem: Database name wrong or doesn't exist
+Solution:
+  1. Check exact database name in Hostinger
+  2. Should be in Databases section
+  3. Verify spelling matches exactly
+
+
+Issue 5: Still getting P1017 errors on Vercel
+----------------------------------------------
+Problem: Variable not updated or not deployed
+Solution:
+  1. Verify DATABASE_URL is in Vercel env vars
+  2. Force redeploy:
+     $ vercel deploy --prod
+  3. Check Vercel logs:
+     $ vercel logs --follow
+  4. Wait 2-3 minutes after adding variable
+  5. Clear browser cache (Ctrl+Shift+Del)
+
+
+STEP-BY-STEP SUMMARY
+====================
+
+For Hostinger to Vercel:
+
+1. ✅ Get connection string from Hostinger panel
+   Format: mysql://user:pass@host:3306/db
+
+2. ✅ Add to Vercel environment variables
+   Settings → Environment Variables → Add DATABASE_URL
+
+3. ✅ Update local .env file
+   $ nano /Users/eaklovyachawla/prop/.env
+
+4. ✅ Test locally
+   $ npm run dev
+   Open http://localhost:3000
+
+5. ✅ Test API endpoints
+   $ curl http://localhost:3000/api/builders
+
+6. ✅ Commit and push
+   $ git add .
+   $ git commit -m "Add Hostinger database connection"
+   $ git push origin main
+
+7. ✅ Verify production deployment
+   Wait for Vercel to deploy
+   Check https://www.oliofly.com
+   Check $ vercel logs --follow
+
+
+HOSTINGER SPECIFIC TIPS
+=======================
+
+Hostinger MySQL Features:
+✅ Remote access available
+✅ Connection pooling supported
+✅ SSL/TLS available (use ?ssl=true)
+✅ Backups available
+✅ Can manage from hPanel
+
+Recommended Connection String for Hostinger:
+mysql://username:password@hostname:3306/database_name?ssl=true
+
+(Add ?ssl=true for secure connection)
+
+
+SECURITY BEST PRACTICES
+=======================
+
+✅ DO:
+  - Use strong passwords (min 12 chars, mix case/symbols)
+  - Rotate passwords periodically
+  - Use .env for local development
+  - Never commit .env to git
+  - Use environment variables for sensitive data
+  - Enable firewall on Hostinger
+
+❌ DON'T:
+  - Don't commit DATABASE_URL to GitHub
+  - Don't share connection string publicly
+  - Don't use "123456" or simple passwords
+  - Don't allow all IPs in Hostinger firewall
+  - Don't hardcode connection strings in code
+
+
+HOSTINGER HELPFUL LINKS
+=======================
+
+Database Management:
+https://hpanel.hostinger.com → Databases
+
+Support:
+https://support.hostinger.com/en/categories/mysql
+
+Create New Database:
+https://hpanel.hostinger.com → Databases → Create
+
+Reset Password:
+https://hpanel.hostinger.com → Databases → Manage
+
+Backups:
+https://hpanel.hostinger.com → Databases → Backups
+
+
+═════════════════════════════════════════════════════════════════
+
+QUICK REFERENCE:
+
+Hostinger: https://hpanel.hostinger.com → Databases
+Vercel: https://vercel.com/dashboard → Settings → Environment Variables
+
+Connection String Format:
+mysql://username:password@hostname:3306/database
+
+═════════════════════════════════════════════════════════════════
